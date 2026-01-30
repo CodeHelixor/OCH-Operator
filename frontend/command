@@ -1,0 +1,12 @@
+npx create-react-app app --template typescript
+cd app
+npm install -D tailwindcss@3 postcss autoprefixer
+npx tailwindcss init -p
+
+content: [
+    './src/**/*.{js,jsx,ts,tsx}',
+],
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

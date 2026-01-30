@@ -1,0 +1,326 @@
+import * as React from "react";
+import Paper from "@mui/material/Paper";
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TablePagination from "@mui/material/TablePagination";
+import TableRow from "@mui/material/TableRow";
+import ConfirmDialog from "../../general/ConfirmDialog";
+import NPConfirmModal from "./modals/NPConfirmModal";
+import {
+  NPCompleteModalData,
+  NPConfirmationModalData,
+  TaskData,
+  TaskTableProps,
+} from "./types";
+import AlertComponent from "../../general/AlertComponent";
+import NPCompleteModal from "./modals/NPCompleteModal";
+
+interface Column {
+  id:
+    | "transactionType"
+    | "telephoneNumber"
+    | "recipientNetworkOperator"
+    | "requestedExecutionDate"
+    | "confirmedExecutionDate"
+    | "confirmationStatus";
+  label: string;
+  minWidth?: number;
+  align?: "right" | "left" | "center";
+  format?: (value: number) => string;
+}
+
+const columns: readonly Column[] = [
+  {
+    id: "transactionType",
+    label: "TransactionType",
+    minWidth: 170,
+    align: "center",
+  },
+  {
+    id: "telephoneNumber",
+    label: "PhoneNumber",
+    minWidth: 100,
+    align: "center",
+  },
+  {
+    id: "recipientNetworkOperator",
+    label: "Recipient Operator",
+    minWidth: 170,
+    align: "center",
+  },
+  {
+    id: "requestedExecutionDate",
+    label: "RequestedExecutionDate",
+    minWidth: 170,
+    align: "center",
+  },
+  {
+    id: "confirmedExecutionDate",
+    label: "ConfirmedExecutionDate",
+    minWidth: 170,
+    align: "center",
+  },
+  {
+    id: "confirmationStatus",
+    label: "ConfirmationStatus",
+    minWidth: 170,
+    align: "center",
+  },
+];
+
+const tnsTypes = [
+  "",
+  "NP Create",
+  "NP OCH Resp",
+  "",
+  "NP Confirmation",
+  "NP Error",
+  "NP Reject",
+  "NP Cancel",
+  "NP Completion",
+  "NP Update",
+  "NP Update Complete",
+  "NP Update",
+  "NP Return",
+  "",
+  "NP Range Update",
+  "NP Range Update",
+  "",
+  "NP Change",
+  "NP Porting Request",
+  "NP Porting Response",
+];
+
+// interface TaskListRow {
+//   id: number;
+//   uniqueId: string;
+//   transactionType: string;
+//   telephoneNumber: string;
+//   recipientNetworkOperator: string;
+//   requestedExecutionDate: string;
+//   confirmedExecutionDate: string;
+// }
+// interface TasklisttableProps {
+//   tasks: TaskListRow[];
+// }
+
+export default function Tasklisttable({ tasks }: TaskTableProps) {
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+  const [selectedRow, setSelectedRow] = React.useState<TaskData | null>(null);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = React.useState(false);
+  const [isCompleteModalOpen, setIsCompleteModalOpen] = React.useState(false);
+
+  const [showAlert, setShowAlert] = React.useState(false);
+  const [alertMsg, setAlertMsg] = React.useState("");
+  const [alertType, setAlertType] = React.useState<
+    "success" | "info" | "warning" | "error"
+  >("success");
+
+  const API_BASE_URL =
+    window._env_?.REACT_APP_API_BASE_URL || "http://localhost:8080";
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setRowsPerPage(+event.target.value);
+    setPage(0);
+  };
+
+  const onNPConfirmModalOK = async (formData: NPConfirmationModalData) => {
+    setIsConfirmModalOpen(false);
+    try {
+      console.log(formData.confirmationStatus);
+      const res = await fetch(
+        `${API_BASE_URL}/confirm/${selectedRow?.originatingOrderNumber}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            confirmedExecutionDate: formData.confirmedExecutionDate,
+            confirmationStatus: formData.confirmationStatus,
+          }),
+        }
+      );
+      if (!res.ok) {
+        throw new Error(`Failed to confirm task: ${res.statusText}`);
+      }
+      const result = await res.json();
+      if (result) {
+        setShowAlert(true);
+        setAlertMsg("Confirmation request is sent to OCH");
+        setAlertType("success");
+        setTimeout(() => setShowAlert(false), 3000);
+      } else {
+        setShowAlert(true);
+        setAlertMsg("Confirmation request is not sent to OCH");
+        setAlertType("error");
+        setTimeout(() => setShowAlert(false), 3000);
+      }
+    } catch (err) {
+      console.error("Error confirming task:", err);
+    }
+  };
+
+  const onNPConfirmModalCancel = () => {
+    setIsConfirmModalOpen(false);
+  };
+
+  const onNPCompleteModalOK = async (formData: NPCompleteModalData) => {
+    setIsCompleteModalOpen(false);
+    console.log(selectedRow);
+    // console.log({
+    //   telephoneNumber: selectedRow?.telephoneNumber,
+    //   ochOrderNumber: selectedRow?.ochOrderNumber,
+    //   uniqueId: selectedRow?.uniqueId,
+    //   originatingOrderNumber: selectedRow?.originatingOrderNumber,
+    //   ...formData,
+    // });
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/complete/${selectedRow?.originatingOrderNumber}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            telephoneNumber: selectedRow?.telephoneNumber,
+            ochOrderNumber: selectedRow?.ochOrderNumber,
+            uniqueId: selectedRow?.uniqueId,
+            originatingOrderNumber: selectedRow?.originatingOrderNumber,
+            ...formData,
+          }),
+        }
+      );
+      if (!res.ok) {
+        throw new Error(`Failed to confirm task: ${res.statusText}`);
+      }
+      const result = await res.json();
+      if (result) {
+        setShowAlert(true);
+        setAlertMsg("Confirmation request is sent to OCH");
+        setAlertType("success");
+        setTimeout(() => setShowAlert(false), 3000);
+      } else {
+        setShowAlert(true);
+        setAlertMsg("Confirmation request is not sent to OCH");
+        setAlertType("error");
+        setTimeout(() => setShowAlert(false), 3000);
+      }
+    } catch (err) {
+      console.error("Error confirming task:", err);
+    }
+  };
+
+  const onNPCompleteModalCancel = () => {
+    setIsCompleteModalOpen(false);
+  };
+
+  React.useEffect(() => {
+    if (selectedRow?.transactionType == "001") {
+      setIsConfirmModalOpen(true);
+    } else if (selectedRow?.transactionType == "004") {
+      setIsCompleteModalOpen(true);
+    }
+  }, [selectedRow]);
+
+  return (
+    <Paper sx={{ width: "100%", overflow: "hidden" }}>
+      <TableContainer sx={{ maxHeight: 440 }}>
+        <Table stickyHeader aria-label="sticky table">
+          <TableHead>
+            <TableRow>
+              {columns.map((column) => (
+                <TableCell
+                  key={column.id}
+                  align={column.align}
+                  style={{ minWidth: column.minWidth }}
+                >
+                  <span className="font-bold text-lg">{column.label}</span>
+                </TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {tasks
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((row, index) => {
+                return (
+                  <TableRow
+                    hover
+                    role="checkbox"
+                    tabIndex={-1}
+                    key={index}
+                    onClick={() => setSelectedRow(row)}
+                    style={{
+                      cursor: row.isCompleted ? "not-allowed" : "pointer",
+                      opacity: row.isCompleted ? 0.5 : 1, // visually faded
+                      pointerEvents: row.isCompleted ? "none" : "auto", // disable interactions
+                    }}
+                  >
+                    {columns.map((column) => {
+                      let value =
+                        column.id == "transactionType"
+                          ? tnsTypes[+row[column.id]]
+                          : (row as any)[column.id];
+                      if (
+                        value &&
+                        typeof value === "object" &&
+                        "value" in value
+                      ) {
+                        // @ts-ignore
+                        value = value.value;
+                      }
+                      return (
+                        <TableCell key={column.id} align={column.align}>
+                          {value}
+                        </TableCell>
+                      );
+                    })}
+                  </TableRow>
+                );
+              })}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <TablePagination
+        rowsPerPageOptions={[10, 25, 100]}
+        component="div"
+        count={tasks.length}
+        rowsPerPage={rowsPerPage}
+        page={page}
+        onPageChange={handleChangePage}
+        onRowsPerPageChange={handleChangeRowsPerPage}
+      />
+      {isConfirmModalOpen && selectedRow && (
+        <NPConfirmModal
+          selectedTask={selectedRow}
+          onNPConfirmModalOK={onNPConfirmModalOK}
+          onNPConfirmModalCancel={onNPConfirmModalCancel}
+        />
+      )}
+      {isCompleteModalOpen && selectedRow && (
+        <NPCompleteModal
+          selectedTask={selectedRow}
+          onNPCompleteModalOK={onNPCompleteModalOK}
+          onNPCompleteModalCancel={onNPCompleteModalCancel}
+        />
+      )}
+      <AlertComponent
+        show={showAlert}
+        message={alertMsg}
+        severity={alertType}
+      />
+    </Paper>
+  );
+}
