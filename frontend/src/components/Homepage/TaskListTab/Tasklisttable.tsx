@@ -7,7 +7,6 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import ConfirmDialog from "../../general/ConfirmDialog";
 import NPConfirmModal from "./modals/NPConfirmModal";
 import {
   NPCompleteModalData,
@@ -17,6 +16,7 @@ import {
 } from "./types";
 import AlertComponent from "../../general/AlertComponent";
 import NPCompleteModal from "./modals/NPCompleteModal";
+import { useAuth } from "../../../context/AuthContext";
 
 interface Column {
   id:
@@ -107,7 +107,16 @@ const tnsTypes = [
 //   tasks: TaskListRow[];
 // }
 
+function isTaskForOperator(task: TaskData, operatorId: string): boolean {
+  if (!operatorId) return false;
+  return (
+    task.recipientServiceOperator === operatorId ||
+    task.recipientNetworkOperator === operatorId
+  );
+}
+
 export default function Tasklisttable({ tasks }: TaskTableProps) {
+  const { username } = useAuth();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [selectedRow, setSelectedRow] = React.useState<TaskData | null>(null);
@@ -119,6 +128,16 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
   const [alertType, setAlertType] = React.useState<
     "success" | "info" | "warning" | "error"
   >("success");
+
+  const visibleTasks = React.useMemo(
+    () => (username ? tasks.filter((t) => isTaskForOperator(t, username)) : []),
+    [tasks, username]
+  );
+
+  React.useEffect(() => {
+    const maxPage = Math.max(0, Math.ceil(visibleTasks.length / rowsPerPage) - 1);
+    setPage((p) => (p > maxPage ? maxPage : p));
+  }, [visibleTasks.length, rowsPerPage]);
 
   const API_BASE_URL =
     window._env_?.REACT_APP_API_BASE_URL || "http://localhost:8080";
@@ -252,7 +271,7 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
             </TableRow>
           </TableHead>
           <TableBody>
-            {tasks
+            {visibleTasks
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row, index) => {
                 return (
@@ -296,7 +315,7 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
       <TablePagination
         rowsPerPageOptions={[10, 25, 100]}
         component="div"
-        count={tasks.length}
+        count={visibleTasks.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

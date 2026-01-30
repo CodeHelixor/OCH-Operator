@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Paper from "@mui/material/Paper";
 import Table from "@mui/material/Table";
 import TableBody from "@mui/material/TableBody";
@@ -13,8 +13,8 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import { useGlobalState } from "../../../../context/GlobalState";
 import AlertComponent from "../../../general/AlertComponent";
 import ConfirmDialog from "../../../general/ConfirmDialog";
-import EditModal from "../../../general/EditModal";
 import { NumberData, NumberTableProps } from "../types";
+import { useAuth } from "../../../../context/AuthContext";
 
 interface Column {
   id: "id" | "telephoneNumber" | "actions" | "regdate" | "moddate" | "status";
@@ -72,7 +72,16 @@ function createData(
   return { id, msisdn, regdate, moddate, status };
 }
 
+function isNumberForOperator(row: NumberData, operatorId: string): boolean {
+  if (!operatorId) return false;
+  return (
+    row.recipientServiceOperator === operatorId ||
+    row.recipientNetworkOperator === operatorId
+  );
+}
+
 export default function Numbertable({ numbers }: NumberTableProps) {
+  const { username } = useAuth();
   const [localNumbers, setLocalNumbers] = React.useState<NumberData[]>([]);
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -85,12 +94,23 @@ export default function Numbertable({ numbers }: NumberTableProps) {
     "success" | "info" | "warning" | "error"
   >("success");
 
-  const API_BASE_URL =
-    window._env_?.REACT_APP_API_BASE_URL || "http://localhost:8080";
+  const visibleNumbers = React.useMemo(
+    () =>
+      username ? numbers.filter((n) => isNumberForOperator(n, username)) : [],
+    [numbers, username]
+  );
 
   React.useEffect(() => {
-    setLocalNumbers(numbers);
-  }, [numbers]);
+    setLocalNumbers(visibleNumbers);
+  }, [visibleNumbers]);
+
+  React.useEffect(() => {
+    const maxPage = Math.max(0, Math.ceil(visibleNumbers.length / rowsPerPage) - 1);
+    setPage((p) => (p > maxPage ? maxPage : p));
+  }, [visibleNumbers.length, rowsPerPage]);
+
+  const API_BASE_URL =
+    window._env_?.REACT_APP_API_BASE_URL || "http://localhost:8080";
 
   const [portationDate, setPortationDate] = React.useState(
     new Date().toISOString().split("T")[0]
