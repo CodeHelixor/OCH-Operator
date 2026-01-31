@@ -115,6 +115,13 @@ function isTaskForOperator(task: TaskData, operatorId: string): boolean {
   );
 }
 
+/** Unique key for deduplication: prefer originatingOrderNumber, fallback to composite */
+function getTaskKey(task: TaskData): string {
+  if (task.originatingOrderNumber) return task.originatingOrderNumber;
+  if (task.uniqueId) return task.uniqueId;
+  return `${task.telephoneNumber}|${task.transactionType}|${task.requestedExecutionDate}|${task.recipientNetworkOperator}`;
+}
+
 export default function Tasklisttable({ tasks }: TaskTableProps) {
   const { username } = useAuth();
   const [page, setPage] = React.useState(0);
@@ -129,10 +136,19 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
     "success" | "info" | "warning" | "error"
   >("success");
 
-  const visibleTasks = React.useMemo(
-    () => (username ? tasks.filter((t) => isTaskForOperator(t, username)) : []),
-    [tasks, username]
-  );
+  const visibleTasks = React.useMemo(() => {
+    if (!username) return [];
+    const filtered = tasks.filter((t) => isTaskForOperator(t, username));
+    // Deduplicate: keep most recent (highest id) per unique task
+    const sorted = [...filtered].sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
+    const seen = new Set<string>();
+    return sorted.filter((t) => {
+      const key = getTaskKey(t);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }, [tasks, username]);
 
   React.useEffect(() => {
     const maxPage = Math.max(0, Math.ceil(visibleTasks.length / rowsPerPage) - 1);
@@ -273,13 +289,12 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
           <TableBody>
             {visibleTasks
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row, index) => {
-                return (
+              .map((row) => (
                   <TableRow
                     hover
                     role="checkbox"
                     tabIndex={-1}
-                    key={index}
+                    key={getTaskKey(row)}
                     onClick={() => setSelectedRow(row)}
                     style={{
                       cursor: row.isCompleted ? "not-allowed" : "pointer",
@@ -307,8 +322,7 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
                       );
                     })}
                   </TableRow>
-                );
-              })}
+                ))}
           </TableBody>
         </Table>
       </TableContainer>
