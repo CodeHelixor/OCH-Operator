@@ -86,6 +86,22 @@ public class RepeatedlyReadFromOCH {
             Transaction transaction = transactions.get(i);
             switch (transaction.getTransactionType()) {
                 case "001": //<NP Create>
+                    // Idempotency: skip if already processed (prevents duplicate saves from OCH retries)
+                    if (numberRepository.findByOriginatingOrderNumber(transaction.getOriginatingOrderNumber()).isPresent()) {
+                        break;
+                    }
+                    // Skip if this phone number already exists for our operator (prevents duplicate display in UI)
+                    try {
+                        String operator = FileUtility.readOperator();
+                        List<NumberEntity> existingByPhone = numberRepository.findByTelephoneNumber(transaction.getTelephoneNumber());
+                        boolean phoneAlreadyExists = existingByPhone.stream()
+                                .anyMatch(n -> operator.equals(n.getRecipientServiceOperator()) || operator.equals(n.getRecipientNetworkOperator()));
+                        if (phoneAlreadyExists) {
+                            break;
+                        }
+                    } catch (Exception e) {
+                        // If operator read fails, proceed with insert
+                    }
                     TasklistEntity taskEntity = new TasklistEntity();
                     taskEntity.setTransactionType(transaction.getTransactionType());
                     taskEntity.setTelephoneNumber(transaction.getTelephoneNumber());

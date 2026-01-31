@@ -94,11 +94,19 @@ export default function Numbertable({ numbers }: NumberTableProps) {
     "success" | "info" | "warning" | "error"
   >("success");
 
-  const visibleNumbers = React.useMemo(
-    () =>
-      username ? numbers.filter((n) => isNumberForOperator(n, username)) : [],
-    [numbers, username]
-  );
+  const visibleNumbers = React.useMemo(() => {
+    if (!username) return [];
+    const filtered = numbers.filter((n) => isNumberForOperator(n, username));
+    // Deduplicate by telephoneNumber: keep most recent (highest id)
+    const sorted = [...filtered].sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
+    const seenPhones = new Set<string>();
+    return sorted.filter((n) => {
+      const phone = n.telephoneNumber;
+      if (!phone || seenPhones.has(phone)) return false;
+      seenPhones.add(phone);
+      return true;
+    });
+  }, [numbers, username]);
 
   React.useEffect(() => {
     setLocalNumbers(visibleNumbers);
