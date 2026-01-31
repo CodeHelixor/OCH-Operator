@@ -287,20 +287,22 @@ export default function Numbertable({ numbers }: NumberTableProps) {
                       }
 
                       if (column.id === "actions") {
+                        const isCurrentOperator =
+                          username && row.currentServiceOperator === username;
                         return (
                           <TableCell key={column.id} align={column.align}>
                             <div className="flex items-center justify-center gap-3">
-                              <IconButton
-                                sx={{
-                                  color: "black",
-                                  "&:hover": {
-                                    color: "red", // Color changes to red on hover
-                                  },
-                                }}
-                                // onClick={() => openEditModal(row)}
-                              >
-                                <EditIcon />
-                              </IconButton>
+                              {isCurrentOperator && (
+                                <IconButton
+                                  sx={{
+                                    color: "black",
+                                    "&:hover": { color: "red" },
+                                  }}
+                                  // onClick={() => openEditModal(row)}
+                                >
+                                  <EditIcon />
+                                </IconButton>
+                              )}
 
                               <IconButton
                                 sx={{
