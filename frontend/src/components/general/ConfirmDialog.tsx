@@ -23,6 +23,7 @@ interface ConfirmDialogProps {
   description: string;
   onClose: () => void;
   onConfirm: () => void;
+  confirmLabel?: string;
 }
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
@@ -31,6 +32,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
   description,
   onClose,
   onConfirm,
+  confirmLabel = "Apply",
 }) => {
   return (
     <Dialog
@@ -48,7 +50,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
           Cancel
         </Button>
         <Button onClick={onConfirm} color="error" variant="contained">
-          Apply
+          {confirmLabel}
         </Button>
       </DialogActions>
     </Dialog>

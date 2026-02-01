@@ -9,7 +9,8 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
+import BlockIcon from "@mui/icons-material/Block";
+import Tooltip from "@mui/material/Tooltip";
 import { useGlobalState } from "../../../../context/GlobalState";
 import AlertComponent from "../../../general/AlertComponent";
 import ConfirmDialog from "../../../general/ConfirmDialog";
@@ -141,17 +142,17 @@ export default function Numbertable({ numbers }: NumberTableProps) {
     setPage(0);
   };
 
-  const openConfirmDialog = (row: NumberData) => {
+  const openRejectConfirmDialog = (row: NumberData) => {
     setConfirmOpen(true);
     setSelectedRow(row);
   };
 
-  const deleteConfirm = () => {
+  const rejectConfirm = () => {
     setConfirmOpen(false);
-    handleDelete(selectedRow);
+    handleReject(selectedRow);
   };
 
-  const handleDelete = async (row: NumberData | null) => {
+  const handleReject = async (row: NumberData | null) => {
     console.log(row);
     setConfirmOpen(false);
     try {
@@ -168,20 +169,20 @@ export default function Numbertable({ numbers }: NumberTableProps) {
       let data = await res.json();
       if (data === true) {
         setShowAlert(true);
-        setAlertMsg("The porting flow was cancelled!");
+        setAlertMsg("The porting flow was rejected!");
         setAlertType("success");
         setTimeout(() => setShowAlert(false), 3000);
         return;
       } else {
         setShowAlert(true);
-        setAlertMsg("Cancellation was failed!");
+        setAlertMsg("Rejection was failed!");
         setAlertType("error");
         setTimeout(() => setShowAlert(false), 3000);
         return;
       }
     } catch (error) {
       setShowAlert(true);
-      setAlertMsg("Deleting was failed!");
+      setAlertMsg("Rejection was failed!");
       setAlertType("error");
       setTimeout(() => setShowAlert(false), 3000);
       return;
@@ -304,17 +305,21 @@ export default function Numbertable({ numbers }: NumberTableProps) {
                                 </IconButton>
                               )}
 
-                              <IconButton
-                                sx={{
-                                  color: "black",
-                                  "&:hover": {
-                                    color: "red",
-                                  },
-                                }}
-                                onClick={() => openConfirmDialog(row)}
-                              >
-                                <DeleteIcon />
-                              </IconButton>
+                              <Tooltip title="Reject" arrow>
+                                <IconButton
+                                  sx={{
+                                    color: "#d32f2f",
+                                    "&:hover": {
+                                      color: "#b71c1c",
+                                      backgroundColor: "rgba(211, 47, 47, 0.08)",
+                                    },
+                                  }}
+                                  onClick={() => openRejectConfirmDialog(row)}
+                                  aria-label="Reject flow"
+                                >
+                                  <BlockIcon />
+                                </IconButton>
+                              </Tooltip>
                             </div>
                           </TableCell>
                         );
@@ -348,8 +353,10 @@ export default function Numbertable({ numbers }: NumberTableProps) {
       <ConfirmDialog
         open={confirmOpen}
         onClose={() => setConfirmOpen(false)}
-        onConfirm={deleteConfirm} // <-- no arguments here, matches () => void
-        description={`Do you really want to stop this flow?`}
+        onConfirm={rejectConfirm}
+        description="Do you really want to reject this flow?"
+        title="Reject flow"
+        confirmLabel="Reject"
       />
       {/* <EditModal
         show={editModalOpen}
