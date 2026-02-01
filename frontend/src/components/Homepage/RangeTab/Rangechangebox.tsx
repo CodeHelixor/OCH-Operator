@@ -22,7 +22,7 @@ type InputFields = {
   otherOperator: string;
   currentRangeHolder: string;
   currentNetworkOperator: string;
-  currentServiceOperator: string;
+  recipientServiceOperator: string;
   spc: string;
   municipality: string;
   routingInfo: string;
@@ -53,7 +53,7 @@ const Rangechangebox = () => {
     otherOperator: "",
     currentRangeHolder: "",
     currentNetworkOperator: "",
-    currentServiceOperator: "",
+    recipientServiceOperator: "",
     spc: "",
     municipality: "",
     routingInfo: "",
@@ -68,7 +68,7 @@ const Rangechangebox = () => {
     otherOperator: "",
     currentRangeHolder: "",
     currentNetworkOperator: "",
-    currentServiceOperator: "",
+    recipientServiceOperator: "",
     spc: "",
     municipality: "",
     routingInfo: "",
@@ -86,7 +86,7 @@ const Rangechangebox = () => {
       otherOperator: "",
       currentRangeHolder: "",
       currentNetworkOperator: "",
-      currentServiceOperator: "",
+      recipientServiceOperator: "",
       spc: "",
       municipality: "",
       routingInfo: "",
@@ -107,7 +107,7 @@ const Rangechangebox = () => {
       otherOperator: "",
       currentRangeHolder: "",
       currentNetworkOperator: "",
-      currentServiceOperator: "",
+      recipientServiceOperator: "",
       spc: "",
       municipality: "",
       routingInfo: "",
@@ -206,8 +206,8 @@ const Rangechangebox = () => {
       newErrors.currentNetworkOperator = "This field is required";
       isValid = false;
     }
-    if (!values.currentServiceOperator) {
-      newErrors.currentServiceOperator = "This field is required";
+    if (!values.recipientServiceOperator) {
+      newErrors.recipientServiceOperator = "This field is required";
       isValid = false;
     }
     if (!values.spc) {
@@ -264,7 +264,7 @@ const Rangechangebox = () => {
           otherOperator: values.otherOperator,
           currentRangeHolder: values.currentRangeHolder,
           currentNetworkOperator: values.currentNetworkOperator,
-          currentServiceOperator: values.currentServiceOperator,
+          recipientServiceOperator: values.recipientServiceOperator,
           spc: values.spc,
           municipality: values.municipality,
           routingInfo: values.routingInfo,
@@ -428,13 +428,13 @@ const Rangechangebox = () => {
             <Grid size={6}>
               <TextField
                 fullWidth
-                id="currentServiceOperator"
-                label="Current Service Operator"
+                id="recipientServiceOperator"
+                label="Recipient Service Operator"
                 variant="outlined"
-                value={values.currentServiceOperator}
-                onChange={handleTextFieldChange("currentServiceOperator")}
-                error={Boolean(errors.currentServiceOperator)}
-                helperText={errors.currentServiceOperator}
+                value={values.recipientServiceOperator}
+                onChange={handleTextFieldChange("recipientServiceOperator")}
+                error={Boolean(errors.recipientServiceOperator)}
+                helperText={errors.recipientServiceOperator}
               />
             </Grid>
             <Grid size={6}>

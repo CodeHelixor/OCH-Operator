@@ -17,7 +17,8 @@ public class RangeEntity {
     private String rangeEnd;
     private String otherOperator;
     private String currentRangeHolder;
-    private String currentServiceOperator;
+    @Column(name = "currentServiceOperator")
+    private String recipientServiceOperator;
     private String currentNetworkOperator;
     private String portingCase;
     private String spc;
@@ -30,7 +31,7 @@ public class RangeEntity {
     private String userId;
 
     public RangeEntity(){}
-    public RangeEntity(String ochOrderNumber, String uniqueId, String originatingOrderNumber, String rangeUpdateType, String rangeStart, String rangeEnd, String otherOperator, String currentRangeHolder, String currentServiceOperator, String currentNetworkOperator, String portingCase, String spc, String municipality, String routingInfo, String chargingInfo, String newNumberType, String createdAt, boolean isCompleted){
+    public RangeEntity(String ochOrderNumber, String uniqueId, String originatingOrderNumber, String rangeUpdateType, String rangeStart, String rangeEnd, String otherOperator, String currentRangeHolder, String recipientServiceOperator, String currentNetworkOperator, String portingCase, String spc, String municipality, String routingInfo, String chargingInfo, String newNumberType, String createdAt, boolean isCompleted){
         this.ochOrderNumber = ochOrderNumber;
         this.uniqueId = uniqueId;
         this.originatingOrderNumber = originatingOrderNumber;
@@ -40,7 +41,7 @@ public class RangeEntity {
         this.otherOperator = otherOperator;
         this.currentRangeHolder = currentRangeHolder;
         this.currentNetworkOperator = currentNetworkOperator;
-        this.currentServiceOperator = currentServiceOperator;
+        this.recipientServiceOperator = recipientServiceOperator;
         this.portingCase = portingCase;
         this.spc=spc;
         this.municipality = municipality;
@@ -109,11 +110,11 @@ public class RangeEntity {
         this.currentRangeHolder = currentRangeHolder;
     }
 
-    public String getCurrentServiceOperator(){
-        return this.currentServiceOperator;
+    public String getRecipientServiceOperator(){
+        return this.recipientServiceOperator;
     }
-    public void setCurrentServiceOperator(String currentServiceOperator){
-        this.currentServiceOperator = currentServiceOperator;
+    public void setRecipientServiceOperator(String recipientServiceOperator){
+        this.recipientServiceOperator = recipientServiceOperator;
     }
 
     public String getCurrentNetworkOperator(){

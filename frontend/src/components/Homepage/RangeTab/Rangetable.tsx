@@ -244,8 +244,8 @@ const Rangetable = ({ ranges }: RangeTableProps) => {
                             <strong>Current Range Operator : </strong>
                             {row.currentRangeHolder}
                             <br />
-                            <strong>Current Service Operator : </strong>
-                            {row.currentServiceOperator}
+                            <strong>Recipient Service Operator : </strong>
+                            {row.recipientServiceOperator ?? row.serviceOperator}
                             <br />
                             <strong>Current Network Operator : </strong>
                             {row.currentNetworkOperator}

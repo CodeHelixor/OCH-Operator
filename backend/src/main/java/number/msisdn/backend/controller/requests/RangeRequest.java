@@ -8,7 +8,7 @@ public class RangeRequest {
     private String otherOperator; 
     private String currentRangeHolder; 
     private String currentNetworkOperator; 
-    private String currentServiceOperator; 
+    private String recipientServiceOperator; 
     private String spc; 
     private String municipality;
     private String routingInfo;
@@ -93,11 +93,11 @@ public class RangeRequest {
         this.chargingInfo = chargingInfo;
     }
 
-    public String getCurrentServiceOperator(){
-        return currentServiceOperator;
+    public String getRecipientServiceOperator(){
+        return recipientServiceOperator;
     }
-    public void setCurrentServiceOperator(String currentServiceOperator){
-        this.currentServiceOperator = currentServiceOperator;
+    public void setRecipientServiceOperator(String recipientServiceOperator){
+        this.recipientServiceOperator = recipientServiceOperator;
     }
 
     public String getNewNumberType(){

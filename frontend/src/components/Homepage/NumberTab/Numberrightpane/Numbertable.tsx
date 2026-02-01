@@ -288,7 +288,7 @@ export default function Numbertable({ numbers }: NumberTableProps) {
 
                       if (column.id === "actions") {
                         const isCurrentOperator =
-                          username && row.currentServiceOperator === username;
+                          username && row.recipientServiceOperator === username;
                         return (
                           <TableCell key={column.id} align={column.align}>
                             <div className="flex items-center justify-center gap-3">

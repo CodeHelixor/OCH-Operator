@@ -5,6 +5,7 @@ export interface RangeData {
   startDate: string;
   rangeHolderId: string;
   serviceOperator: string;
+  recipientServiceOperator?: string;
   networkOperator: string;
   lubo: string;
   numberType: string;

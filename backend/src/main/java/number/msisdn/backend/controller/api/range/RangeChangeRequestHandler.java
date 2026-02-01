@@ -43,7 +43,7 @@ public class RangeChangeRequestHandler {
             tx.setOtherOperator(request.getOtherOperator());
             tx.setCurrentRangeHolder(request.getCurrentRangeHolder());
             tx.setCurrentNetworkOperator(request.getCurrentNetworkOperator());
-            tx.setCurrentServiceOperator(request.getCurrentServiceOperator());
+            tx.setCurrentServiceOperator(request.getRecipientServiceOperator());
             tx.setPortingCase(request.getPortingCase());
             tx.setSpc(request.getSpc());
             tx.setMunicipality(request.getMunicipality());
@@ -68,7 +68,7 @@ public class RangeChangeRequestHandler {
                     rangeEntity.setOtherOperator(request.getOtherOperator());
                     rangeEntity.setCurrentRangeHolder(request.getCurrentRangeHolder());
                     rangeEntity.setCurrentNetworkOperator(request.getCurrentNetworkOperator());
-                    rangeEntity.setCurrentServiceOperator(request.getCurrentServiceOperator());
+                    rangeEntity.setRecipientServiceOperator(request.getRecipientServiceOperator());
                     rangeEntity.setSpc(request.getSpc());
                     rangeEntity.setMunicipality(request.getMunicipality());
                     rangeEntity.setRoutingInfo(request.getRoutingInfo());

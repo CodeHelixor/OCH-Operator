@@ -43,7 +43,7 @@ public class RangeManage {
                 Objects.equals(entity.getNewNumberType(), currentEntity.getNumberType()),
                 Objects.equals(entity.getCurrentRangeHolder(), currentEntity.getRangeHolderId()),
                 Objects.equals(entity.getCurrentNetworkOperator(), currentEntity.getNetworkOperator()),
-                Objects.equals(entity.getCurrentServiceOperator(), currentEntity.getServiceOperator())
+                Objects.equals(entity.getRecipientServiceOperator(), currentEntity.getServiceOperator())
             };
             
             boolean isEqual = true;
@@ -67,7 +67,7 @@ public class RangeManage {
 
         newEntity.setStartDate(formattedDateTime);
         newEntity.setRangeHolderId(entity.getCurrentRangeHolder());
-        newEntity.setServiceOperator(entity.getCurrentServiceOperator());
+        newEntity.setServiceOperator(entity.getRecipientServiceOperator());
         newEntity.setNetworkOperator(entity.getCurrentNetworkOperator());
         newEntity.setLubo(entity.getOtherOperator());
         newEntity.setNumberType(entity.getNewNumberType());
@@ -210,7 +210,7 @@ public class RangeManage {
                     newEntity.setRangeEnd(String.valueOf(newEndNumber ));
                     newEntity.setStartDate(formattedDateTime);
                     newEntity.setRangeHolderId(entity.getCurrentRangeHolder());
-                    newEntity.setServiceOperator(entity.getCurrentServiceOperator());
+                    newEntity.setServiceOperator(entity.getRecipientServiceOperator());
                     newEntity.setNetworkOperator(entity.getCurrentNetworkOperator());
                     newEntity.setLubo(entity.getOtherOperator());
                     newEntity.setNumberType(entity.getNewNumberType());
@@ -247,7 +247,7 @@ public class RangeManage {
                     Objects.equals(entity.getNewNumberType(), currentEntity.getNumberType()),
                     Objects.equals(entity.getCurrentRangeHolder(), currentEntity.getRangeHolderId()),
                     Objects.equals(entity.getCurrentNetworkOperator(), currentEntity.getNetworkOperator()),
-                    Objects.equals(entity.getCurrentServiceOperator(), currentEntity.getServiceOperator())
+                    Objects.equals(entity.getRecipientServiceOperator(), currentEntity.getServiceOperator())
                 };
                 
                 boolean isEqual = true;
@@ -271,7 +271,7 @@ public class RangeManage {
 
             newEntity.setStartDate(formattedDateTime);
             newEntity.setRangeHolderId(entity.getCurrentRangeHolder());
-            newEntity.setServiceOperator(entity.getCurrentServiceOperator());
+            newEntity.setServiceOperator(entity.getRecipientServiceOperator());
             newEntity.setNetworkOperator(entity.getCurrentNetworkOperator());
             newEntity.setLubo(entity.getOtherOperator());
             newEntity.setNumberType(entity.getNewNumberType());

@@ -107,12 +107,10 @@ const tnsTypes = [
 //   tasks: TaskListRow[];
 // }
 
-function isTaskForOperator(task: TaskData, operatorId: string): boolean {
+/** Only show tasks where recipientServiceOperator is the authenticated user */
+function isTaskForCurrentUser(task: TaskData, operatorId: string): boolean {
   if (!operatorId) return false;
-  return (
-    task.recipientServiceOperator === operatorId ||
-    task.recipientNetworkOperator === operatorId
-  );
+  return task.recipientServiceOperator === operatorId;
 }
 
 /** Unique key for deduplication: prefer originatingOrderNumber, fallback to composite */
@@ -138,7 +136,7 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
 
   const visibleTasks = React.useMemo(() => {
     if (!username) return [];
-    const filtered = tasks.filter((t) => isTaskForOperator(t, username));
+    const filtered = tasks.filter((t) => isTaskForCurrentUser(t, username));
     // Deduplicate: keep most recent (highest id) per unique task
     const sorted = [...filtered].sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
     const seen = new Set<string>();
