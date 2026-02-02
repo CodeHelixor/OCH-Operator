@@ -201,6 +201,9 @@ export default function Numbertable({ numbers }: NumberTableProps) {
   const handleRejectSubmit = async (data: NpRejectFormData) => {
     setRejectSubmitting(true);
     try {
+      const tempUniqueId = (parseInt(data.uniqueId) + 1).toString();
+      console.log(tempUniqueId, "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
+
       const res = await fetch(`${API_BASE_URL}/reject`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -208,7 +211,7 @@ export default function Numbertable({ numbers }: NumberTableProps) {
           transactionType: NP_REJECT_TRANSACTION_TYPE,
           telephoneNumber: data.telephoneNumber,
           ochOrderNumber: data.ochOrderNumber,
-          uniqueId: data.uniqueId,
+          uniqueId: tempUniqueId,  // Sending the incremented string uniqueId
           originatingOrderNumber: data.originatingOrderNumber,
           otherOperator: data.otherOperator,
           rejectCode: data.rejectCode,

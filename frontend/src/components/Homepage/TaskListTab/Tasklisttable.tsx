@@ -7,7 +7,6 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import Button from "@mui/material/Button";
 import NPConfirmModal from "./modals/NPConfirmModal";
 import {
   NPCompleteModalData,
@@ -108,13 +107,10 @@ const tnsTypes = [
 //   tasks: TaskListRow[];
 // }
 
-/** Show tasks where authenticated user is recipient (service or network operator). */
+/** Only show tasks where recipientServiceOperator is the authenticated user */
 function isTaskForCurrentUser(task: TaskData, operatorId: string): boolean {
   if (!operatorId) return false;
-  return (
-    task.recipientServiceOperator === operatorId ||
-    task.recipientNetworkOperator === operatorId
-  );
+  return task.recipientServiceOperator === operatorId;
 }
 
 /** Unique key for deduplication: prefer originatingOrderNumber, fallback to composite */
@@ -263,54 +259,46 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
     setIsCompleteModalOpen(false);
   };
 
-  /** Open modal only when authenticated user is recipient_network_operator for the task. */
-  const isRecipientNetwork =
-    Boolean(
-      selectedRow &&
-        username &&
-        selectedRow.recipientNetworkOperator === username
-    );
   React.useEffect(() => {
-    if (!isRecipientNetwork) {
-      setIsConfirmModalOpen(false);
-      setIsCompleteModalOpen(false);
-      return;
-    }
-    if (selectedRow?.transactionType === "001") {
+    if (selectedRow?.transactionType == "001") {
       setIsConfirmModalOpen(true);
-    } else if (selectedRow?.transactionType === "004") {
+    } else if (selectedRow?.transactionType == "004") {
       setIsCompleteModalOpen(true);
     }
-  }, [selectedRow, username, isRecipientNetwork]);
+  }, [selectedRow]);
 
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader aria-label="sticky table">
-            <TableHead>
-              <TableRow>
-                {columns.map((column) => (
-                  <TableCell
-                    key={column.id}
-                    align={column.align}
-                    style={{ minWidth: column.minWidth }}
-                  >
-                    <span className="font-bold text-lg">{column.label}</span>
-                  </TableCell>
-                ))}
-                <TableCell align="center" style={{ minWidth: 100 }}>
-                  <span className="font-bold text-lg">Confirm</span>
+          <TableHead>
+            <TableRow>
+              {columns.map((column) => (
+                <TableCell
+                  key={column.id}
+                  align={column.align}
+                  style={{ minWidth: column.minWidth }}
+                >
+                  <span className="font-bold text-lg">{column.label}</span>
                 </TableCell>
-              </TableRow>
-            </TableHead>
+              ))}
+            </TableRow>
+          </TableHead>
           <TableBody>
             {visibleTasks
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row) => (
                   <TableRow
                     hover
+                    role="checkbox"
+                    tabIndex={-1}
                     key={getTaskKey(row)}
-                    style={{ opacity: row.isCompleted ? 0.5 : 1 }}
+                    onClick={() => setSelectedRow(row)}
+                    style={{
+                      cursor: row.isCompleted ? "not-allowed" : "pointer",
+                      opacity: row.isCompleted ? 0.5 : 1, // visually faded
+                      pointerEvents: row.isCompleted ? "none" : "auto", // disable interactions
+                    }}
                   >
                     {columns.map((column) => {
                       let value =
@@ -331,21 +319,6 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
                         </TableCell>
                       );
                     })}
-                    <TableCell align="center">
-                      <Button
-                        size="small"
-                        variant="contained"
-                        disabled={
-                          row.isCompleted ||
-                          (row.transactionType !== "001" &&
-                            row.transactionType !== "004") ||
-                          row.recipientNetworkOperator !== username
-                        }
-                        onClick={() => setSelectedRow(row)}
-                      >
-                        Confirm
-                      </Button>
-                    </TableCell>
                   </TableRow>
                 ))}
           </TableBody>
