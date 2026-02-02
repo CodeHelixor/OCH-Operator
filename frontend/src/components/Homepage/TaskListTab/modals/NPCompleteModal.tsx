@@ -71,6 +71,13 @@ const NPCompleteModal: React.FC<ModalProps> = ({
       numberPorted: "",
     };
 
+    // [DISABLED] Set to true to re-enable all validation conditions below.
+    const VALIDATIONS_ENABLED = false;
+    if (!VALIDATIONS_ENABLED) {
+      setErrors(newErrors);
+      return true;
+    }
+
     let isValid = true;
 
     if (formData.portingCase === "PortedWithGeo") {

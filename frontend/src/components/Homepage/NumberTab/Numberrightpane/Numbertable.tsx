@@ -10,12 +10,17 @@ import TableRow from "@mui/material/TableRow";
 import IconButton from "@mui/material/IconButton";
 import EditIcon from "@mui/icons-material/Edit";
 import BlockIcon from "@mui/icons-material/Block";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Tooltip from "@mui/material/Tooltip";
 import { useGlobalState } from "../../../../context/GlobalState";
 import AlertComponent from "../../../general/AlertComponent";
-import ConfirmDialog from "../../../general/ConfirmDialog";
+import RejectModal, { NpRejectFormData } from "../modals/RejectModal";
+import CancelConfirmModal from "../modals/CancelConfirmModal";
 import { NumberData, NumberTableProps } from "../types";
 import { useAuth } from "../../../../context/AuthContext";
+
+/** OCH NP Reject transaction type. */
+const NP_REJECT_TRANSACTION_TYPE = "006";
 
 interface Column {
   id: "id" | "telephoneNumber" | "actions" | "regdate" | "moddate" | "status";
@@ -87,7 +92,10 @@ export default function Numbertable({ numbers }: NumberTableProps) {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [showAlert, setShowAlert] = React.useState(false);
-  const [confirmOpen, setConfirmOpen] = React.useState(false);
+  const [rejectModalOpen, setRejectModalOpen] = React.useState(false);
+  const [rejectSubmitting, setRejectSubmitting] = React.useState(false);
+  const [cancelModalOpen, setCancelModalOpen] = React.useState(false);
+  const [cancelSubmitting, setCancelSubmitting] = React.useState(false);
   const [editModalOpen, setEditModalOpen] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<NumberData | null>(null);
   const [alertMsg, setAlertMsg] = React.useState("");
@@ -142,50 +150,92 @@ export default function Numbertable({ numbers }: NumberTableProps) {
     setPage(0);
   };
 
-  const openRejectConfirmDialog = (row: NumberData) => {
-    setConfirmOpen(true);
+  const openRejectModal = (row: NumberData) => {
     setSelectedRow(row);
+    setRejectModalOpen(true);
   };
 
-  const rejectConfirm = () => {
-    setConfirmOpen(false);
-    handleReject(selectedRow);
+  const openCancelModal = (row: NumberData) => {
+    setSelectedRow(row);
+    setCancelModalOpen(true);
   };
 
-  const handleReject = async (row: NumberData | null) => {
-    console.log(row);
-    setConfirmOpen(false);
+  const handleCancelApply = async () => {
+    if (!selectedRow) return;
+    setCancelSubmitting(true);
     try {
       const res = await fetch(`${API_BASE_URL}/cancel`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          telephoneNumber: row?.telephoneNumber,
-          ochOrderNumber: row?.ochOrderNumber,
-          uniqueId: row?.uniqueId,
-          originatingOrderNumber: row?.originatingOrderNumber,
+          telephoneNumber: selectedRow.telephoneNumber,
+          ochOrderNumber: selectedRow.ochOrderNumber ?? "",
+          originatingOrderNumber: selectedRow.originatingOrderNumber ?? "",
+          uniqueId: selectedRow.uniqueId ?? "",
         }),
       });
-      let data = await res.json();
-      if (data === true) {
+      const result = await res.json();
+      if (result === true) {
         setShowAlert(true);
-        setAlertMsg("The porting flow was rejected!");
+        setAlertMsg("Cancel request was sent to OCH successfully.");
         setAlertType("success");
         setTimeout(() => setShowAlert(false), 3000);
-        return;
-      } else {
-        setShowAlert(true);
-        setAlertMsg("Rejection was failed!");
-        setAlertType("error");
-        setTimeout(() => setShowAlert(false), 3000);
+        setCancelModalOpen(false);
+        setSelectedRow(null);
         return;
       }
-    } catch (error) {
       setShowAlert(true);
-      setAlertMsg("Rejection was failed!");
+      setAlertMsg("Cancel request failed.");
       setAlertType("error");
       setTimeout(() => setShowAlert(false), 3000);
-      return;
+    } catch {
+      setShowAlert(true);
+      setAlertMsg("Cancel request failed.");
+      setAlertType("error");
+      setTimeout(() => setShowAlert(false), 3000);
+    } finally {
+      setCancelSubmitting(false);
+    }
+  };
+
+  const handleRejectSubmit = async (data: NpRejectFormData) => {
+    setRejectSubmitting(true);
+    try {
+      const res = await fetch(`${API_BASE_URL}/reject`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          transactionType: NP_REJECT_TRANSACTION_TYPE,
+          telephoneNumber: data.telephoneNumber,
+          ochOrderNumber: data.ochOrderNumber,
+          uniqueId: data.uniqueId,
+          originatingOrderNumber: data.originatingOrderNumber,
+          otherOperator: data.otherOperator,
+          rejectCode: data.rejectCode,
+          rejectText: data.rejectText,
+        }),
+      });
+      const result = await res.json();
+      if (result === true) {
+        setShowAlert(true);
+        setAlertMsg("NP Reject was sent to OCH successfully.");
+        setAlertType("success");
+        setTimeout(() => setShowAlert(false), 3000);
+        setRejectModalOpen(false);
+        setSelectedRow(null);
+        return;
+      }
+      setShowAlert(true);
+      setAlertMsg("NP Reject request failed.");
+      setAlertType("error");
+      setTimeout(() => setShowAlert(false), 3000);
+    } catch {
+      setShowAlert(true);
+      setAlertMsg("NP Reject request failed.");
+      setAlertType("error");
+      setTimeout(() => setShowAlert(false), 3000);
+    } finally {
+      setRejectSubmitting(false);
     }
   };
 
@@ -294,32 +344,50 @@ export default function Numbertable({ numbers }: NumberTableProps) {
                           <TableCell key={column.id} align={column.align}>
                             <div className="flex items-center justify-center gap-3">
                               {isCurrentOperator && (
-                                <IconButton
-                                  sx={{
-                                    color: "black",
-                                    "&:hover": { color: "red" },
-                                  }}
-                                  // onClick={() => openEditModal(row)}
-                                >
-                                  <EditIcon />
-                                </IconButton>
+                                <>
+                                  <IconButton
+                                    sx={{
+                                      color: "black",
+                                      "&:hover": { color: "red" },
+                                    }}
+                                    // onClick={() => openEditModal(row)}
+                                  >
+                                    <EditIcon />
+                                  </IconButton>
+                                  <Tooltip title="Reject" arrow>
+                                    <IconButton
+                                      sx={{
+                                        color: "#d32f2f",
+                                        "&:hover": {
+                                          color: "#b71c1c",
+                                          backgroundColor: "rgba(211, 47, 47, 0.08)",
+                                        },
+                                      }}
+                                      onClick={() => openRejectModal(row)}
+                                      aria-label="Reject flow"
+                                    >
+                                      <BlockIcon />
+                                    </IconButton>
+                                  </Tooltip>
+                                </>
                               )}
-
-                              <Tooltip title="Reject" arrow>
-                                <IconButton
-                                  sx={{
-                                    color: "#d32f2f",
-                                    "&:hover": {
-                                      color: "#b71c1c",
-                                      backgroundColor: "rgba(211, 47, 47, 0.08)",
-                                    },
-                                  }}
-                                  onClick={() => openRejectConfirmDialog(row)}
-                                  aria-label="Reject flow"
-                                >
-                                  <BlockIcon />
-                                </IconButton>
-                              </Tooltip>
+                              {!isCurrentOperator && (
+                                <Tooltip title="Cancel" arrow>
+                                  <IconButton
+                                    sx={{
+                                      color: "#757575",
+                                      "&:hover": {
+                                        color: "#424242",
+                                        backgroundColor: "rgba(0, 0, 0, 0.04)",
+                                      },
+                                    }}
+                                    onClick={() => openCancelModal(row)}
+                                    aria-label="Cancel (send to OCH)"
+                                  >
+                                    <DeleteIcon />
+                                  </IconButton>
+                                </Tooltip>
+                              )}
                             </div>
                           </TableCell>
                         );
@@ -350,13 +418,25 @@ export default function Numbertable({ numbers }: NumberTableProps) {
         message={alertMsg}
         severity={alertType}
       />
-      <ConfirmDialog
-        open={confirmOpen}
-        onClose={() => setConfirmOpen(false)}
-        onConfirm={rejectConfirm}
-        description="Do you really want to reject this flow?"
-        title="Reject flow"
-        confirmLabel="Reject"
+      <RejectModal
+        open={rejectModalOpen}
+        onClose={() => {
+          setRejectModalOpen(false);
+          setSelectedRow(null);
+        }}
+        row={selectedRow}
+        onReject={handleRejectSubmit}
+        isSubmitting={rejectSubmitting}
+      />
+      <CancelConfirmModal
+        open={cancelModalOpen}
+        onClose={() => {
+          setCancelModalOpen(false);
+          setSelectedRow(null);
+        }}
+        row={selectedRow}
+        onApply={handleCancelApply}
+        isSubmitting={cancelSubmitting}
       />
       {/* <EditModal
         show={editModalOpen}

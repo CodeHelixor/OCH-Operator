@@ -64,6 +64,13 @@ const NPConfirmModal: React.FC<ModalProps> = ({
       confirmationStatus: "",
     };
 
+    // [DISABLED] Set to true to re-enable all validation conditions below.
+    const VALIDATIONS_ENABLED = false;
+    if (!VALIDATIONS_ENABLED) {
+      setErrors(newErrors);
+      return true;
+    }
+
     let isValid = true;
     const today = dayjs();
     const confirmedDate = dayjs(formData.confirmedExecutionDate, "YYYYMMDD");
