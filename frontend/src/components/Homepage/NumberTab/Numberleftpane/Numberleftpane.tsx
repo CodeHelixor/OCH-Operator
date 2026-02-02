@@ -28,7 +28,7 @@ const Numberleftpane = () => {
   let fileInputRef = useRef<HTMLInputElement>(null);
 
   const onImportModalOk = async (formData: ImportModalData) => {
-    console.log(formData);
+    // console.log(formData);
     setIsImportModalOpen(false);
     try {
       const res = await fetch(`${API_BASE_URL}/create`, {
@@ -37,7 +37,8 @@ const Numberleftpane = () => {
         body: JSON.stringify({ ...formData, userId }),
       });
       const data = await res.json();
-      // dispatch({ type: "ADD_NUMBER", payload: data });
+      console.log("====================here======================");
+      console.log(data);
       if (data.success) {
         setShowAlert(true);
         setAlertMsg("Number porting request is sent to OCH");
@@ -78,7 +79,8 @@ const Numberleftpane = () => {
         },
       });
       let data = await res.json();
-
+      console.log("====================here======================");
+      console.log(data);
       if (searchRange != "") {
         data = data.filter((item: any) => item.msisdn.startsWith(searchStr));
       }
@@ -87,7 +89,7 @@ const Numberleftpane = () => {
       }
       // dispatch({ type: "SET_SEARCHED_NUMBERS", payload: data });
     } catch (err) {
-      console.log("Error initializing or fetching data: ", err);
+      // console.log("Error initializing or fetching data: ", err);
     }
   };
 
@@ -114,6 +116,8 @@ const Numberleftpane = () => {
             body: JSON.stringify({ msisdn }),
           });
           const data = await res.json();
+          console.log("====================here======================");
+          console.log(data);
           if (data == null) {
             setShowAlert(true);
             setAlertMsg("The transaction is failed!");
@@ -148,7 +152,8 @@ const Numberleftpane = () => {
         method: "POST",
       });
       const data = await res.json();
-      // Assuming data is an array of MSISDN strings or objects like { msisdn: "12345" }
+      console.log("====================here======================");
+      console.log(data);
       const msisdnList = data
         .map((item: any) => item.msisdn ?? item)
         .join("\n");
@@ -169,7 +174,7 @@ const Numberleftpane = () => {
       setAlertType("success");
       setTimeout(() => setShowAlert(false), 3000);
     } catch (err) {
-      console.error("Error downloading data: ", err);
+      // console.error("Error downloading data: ", err);
       setShowAlert(true);
       setAlertMsg("Failed to download the list.");
       setAlertType("error");

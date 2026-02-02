@@ -281,6 +281,8 @@ const Rangechangebox = () => {
         }),
       });
       const data = await res.json();
+      console.log("====================here======================");
+      console.log(data);
       if (data) {
         setShowAlert(true);
         setAlertMsg("Range Update request is sent to OCH");

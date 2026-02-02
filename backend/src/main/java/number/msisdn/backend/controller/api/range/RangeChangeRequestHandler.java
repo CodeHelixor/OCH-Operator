@@ -54,7 +54,8 @@ public class RangeChangeRequestHandler {
             //tx.setRequestedExecutionDate(LocalDate.now().plusDays(2).toString())
             batch.getTransactions().add(tx);
             boolean result = soapClient.getPort().send(batch);
-            // System.out.println(result);
+            System.out.println("====================here======================");
+            System.out.println("OCH RangeChange send result: " + result);
             if(result){
                 // sequenceIO.setSequenceId(sequence+1);      
                 try{

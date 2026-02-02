@@ -1,9 +1,16 @@
 package number.msisdn.backend.controller.api.number;
 
+import java.util.List;
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import number.msisdn.backend.controller.requests.NpRejectRequest;
+import number.msisdn.backend.database.entities.NumberEntity;
+import number.msisdn.backend.database.entities.TasklistEntity;
+import number.msisdn.backend.database.repositories.NumberRepository;
+import number.msisdn.backend.database.repositories.TasklistRepository;
 import number.msisdn.backend.general.BatchIdIO;
 import number.msisdn.backend.soap.SoapClient;
 import number.msisdn.soapclient.Batch;
@@ -15,6 +22,7 @@ import number.msisdn.soapclient.UserException_Exception;
 /**
  * Sends NP Reject transaction (TransactionType 006) to OCH.
  * Required: TransactionType "006", TelephoneNumber, RejectCode, RejectText; order identifiers for linking to NP Create.
+ * On successful send, removes the related number and tasklist records from the database.
  */
 @Service
 public class NpRejectRequestHandler {
@@ -26,9 +34,13 @@ public class NpRejectRequestHandler {
     private SoapClient soapClient;
 
     private final BatchIdIO batchIdIO;
+    private final NumberRepository numberRepository;
+    private final TasklistRepository tasklistRepository;
 
-    public NpRejectRequestHandler(BatchIdIO batchIdIO) {
+    public NpRejectRequestHandler(BatchIdIO batchIdIO, NumberRepository numberRepository, TasklistRepository tasklistRepository) {
         this.batchIdIO = batchIdIO;
+        this.numberRepository = numberRepository;
+        this.tasklistRepository = tasklistRepository;
     }
 
     public boolean handle(NpRejectRequest request) {
@@ -55,9 +67,11 @@ public class NpRejectRequestHandler {
 
             batch.getTransactions().add(tx);
             boolean result = soapClient.getPort().send(batch);
-
+            System.out.println("====================here======================");
+            System.out.println("OCH NpReject send result: " + result);
             if (result) {
                 batchIdIO.setBatchId(batchIdIO.getBatchId() + 1);
+                removeRelatedData(request.getOriginatingOrderNumber());
                 return true;
             }
             return false;
@@ -66,6 +80,28 @@ public class NpRejectRequestHandler {
         } catch (Exception e) {
             e.printStackTrace();
             return false;
+        }
+    }
+
+    /**
+     * Removes number and tasklist records linked to the given originating order number.
+     * Called after OCH accepts the NP Reject so the database stays consistent.
+     */
+    private void removeRelatedData(String originatingOrderNumber) {
+        if (originatingOrderNumber == null || originatingOrderNumber.isEmpty()) {
+            return;
+        }
+        try {
+            Optional<NumberEntity> numberOpt = numberRepository.findByOriginatingOrderNumber(originatingOrderNumber);
+            if (numberOpt.isPresent()) {
+                numberRepository.delete(numberOpt.get());
+            }
+            List<TasklistEntity> tasklists = tasklistRepository.findByOriginatingOrderNumber(originatingOrderNumber);
+            if (!tasklists.isEmpty()) {
+                tasklistRepository.deleteAll(tasklists);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

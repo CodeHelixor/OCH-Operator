@@ -39,6 +39,8 @@ const LoginPage = () => {
       });
 
       const data = await res.json();
+      console.log("====================here======================");
+      console.log(data);
       if (data === true) {
         setAuthUsername(username);
         if (!localStorage.getItem("userId")) {
@@ -54,7 +56,7 @@ const LoginPage = () => {
         return;
       }
     } catch (error) {
-      console.error("Error: ", error);
+      // console.error("Error: ", error);
     }
   };
 

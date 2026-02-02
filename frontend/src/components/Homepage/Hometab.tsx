@@ -82,11 +82,13 @@ export default function Hometab() {
         method: "POST",
       });
       let data = await res.json();
+      console.log("====================here======================");
+      console.log(data);
       if (data) {
         setNumbers(data.filter((item: NumberData) => item.status != null));
       }
     } catch {
-      console.log("Error in reading ranges");
+      // console.log("Error in reading ranges");
     }
   };
 
@@ -96,11 +98,13 @@ export default function Hometab() {
         method: "POST",
       });
       let data = await res.json();
+      console.log("====================here======================");
+      console.log(data);
       if (data) {
         setRanges(data);
       }
     } catch {
-      console.log("Error in reading ranges");
+      // console.log("Error in reading ranges");
     }
   };
 
@@ -110,9 +114,11 @@ export default function Hometab() {
         method: "POST",
       });
       let data = await res.json();
+      console.log("====================here======================");
+      console.log(data);
       setTasks(data);
     } catch (err) {
-      console.log("Error reading from TaskLists: ", err);
+      // console.log("Error reading from TaskLists: ", err);
     }
   };
   const readErrors = async () => {
@@ -121,13 +127,15 @@ export default function Hometab() {
         method: "POST",
       });
       let data = await res.json();
+      console.log("====================here======================");
+      console.log(data);
       setBadgeContent(
         data.filter((note: any) => !note.isViewed && note.userId == userId)
           .length
       );
       setErrors(data.filter((note: any) => note.userId == userId));
     } catch (err) {
-      console.log("Error reading from TaskLists: ", err);
+      // console.log("Error reading from TaskLists: ", err);
     }
   };
 
@@ -137,6 +145,8 @@ export default function Hometab() {
         method: "POST",
       });
       let data = await res.json();
+      console.log("====================here======================");
+      console.log(data);
       let notifications = data.filter((note: any) => userId == note.userId);
       for (let i = 0; i < notifications.length; i++) {
         if (notifications[i].userId == userId) {
@@ -151,13 +161,16 @@ export default function Hometab() {
             setAlertType("success");
             setTimeout(() => setShowAlert(false), 3000);
           }
-          await fetch(`${API_BASE_URL}/deleteNotify/${notifications[i].id}`, {
+          const delRes = await fetch(`${API_BASE_URL}/deleteNotify/${notifications[i].id}`, {
             method: "POST",
           });
+          const delData = await delRes.json().catch(() => null);
+          console.log("====================here======================");
+          console.log(delData);
         }
       }
     } catch (err) {
-      console.log("Error reading from TaskLists: ", err);
+      // console.log("Error reading from TaskLists: ", err);
     }
   };
 

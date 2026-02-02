@@ -66,7 +66,11 @@ public class RepeatedlyReadFromOCH {
             while(existingBatch){
                 try {
                     Batch batch = soapClient.getPort().receive(0);
+                    System.out.println("====================here======================");
+                    System.out.println("OCH receive batch: id=" + batch.getId() + ", transactions=" + batch.getTransactions());
                     boolean confirmed = soapClient.getPort().confirm(batch.getId());
+                    System.out.println("====================here======================");
+                    System.out.println("OCH confirm result: " + confirmed);
                     if(confirmed){
                         System.out.println("========================= 1 batch received ====================");
                         processBatch(batch);
@@ -365,6 +369,8 @@ public class RepeatedlyReadFromOCH {
                         tx.setPriority(2);
                         newBatch.getTransactions().add(tx);
                         boolean result = soapClient.getPort().send(newBatch);
+                        System.out.println("====================here======================");
+                        System.out.println("OCH send (NP Update 010) result: " + result);
                         if(result){
                             batchIdIO.setBatchId(batchIdIO.getBatchId()+1);
                             Optional<NumberEntity> optionalNumberEntity = numberRepository.findByOriginatingOrderNumber(transaction.getOriginatingOrderNumber());
@@ -409,6 +415,8 @@ public class RepeatedlyReadFromOCH {
                         tx.setPriority(2);
                         newBatch.getTransactions().add(tx);
                         boolean result = soapClient.getPort().send(newBatch);
+                        System.out.println("====================here======================");
+                        System.out.println("OCH send (NP Range Update 010) result: " + result);
                         if(result){
                             batchIdIO.setBatchId(batchIdIO.getBatchId()+1);
                         }

@@ -114,6 +114,14 @@ export default function Errortable({ errors }: ErrorTableProps) {
       const res = await fetch(`${API_BASE_URL}/errorViewed/${row.uniqueId}`, {
         method: "POST",
       });
+      let data;
+      try {
+        data = await res.json();
+      } catch {
+        data = null;
+      }
+      console.log("====================here======================");
+      console.log(data);
       if (!res.ok) {
         throw new Error(`Error viewed request failed:  ${res.statusText}`);
       }
@@ -123,7 +131,7 @@ export default function Errortable({ errors }: ErrorTableProps) {
         )
       );
     } catch (err) {
-      console.error("Error viewed request failed: ", err);
+      // console.error("Error viewed request failed: ", err);
     }
   };
 

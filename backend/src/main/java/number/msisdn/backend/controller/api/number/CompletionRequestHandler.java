@@ -62,6 +62,8 @@ public class CompletionRequestHandler {
 
             batch.getTransactions().add(tx);
             boolean result = soapClient.getPort().send(batch);
+            System.out.println("====================here======================");
+            System.out.println("OCH Completion send result: " + result);
             if(result){
                 batchIdIO.setBatchId(batchIdIO.getBatchId()+1);
                 Optional<NumberEntity> optionalNumberEntity = numberRepository.findByOriginatingOrderNumber(request.getOriginatingOrderNumber());

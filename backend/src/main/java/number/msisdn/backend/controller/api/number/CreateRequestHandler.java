@@ -63,6 +63,8 @@ public class CreateRequestHandler {
 
             batch.getTransactions().add(tx);
             boolean result = soapClient.getPort().send(batch);
+            System.out.println("====================here======================");
+            System.out.println("OCH Create send result: " + result);
             if(result){
                 // sequenceIO.setSequenceId(sequence+1);                
                 batchIdIO.setBatchId(batchIdIO.getBatchId()+1);

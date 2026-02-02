@@ -170,7 +170,7 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
   const onNPConfirmModalOK = async (formData: NPConfirmationModalData) => {
     setIsConfirmModalOpen(false);
     try {
-      console.log(formData.confirmationStatus);
+      // console.log(formData.confirmationStatus);
       const res = await fetch(
         `${API_BASE_URL}/confirm/${selectedRow?.originatingOrderNumber}`,
         {
@@ -188,6 +188,8 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
         throw new Error(`Failed to confirm task: ${res.statusText}`);
       }
       const result = await res.json();
+      console.log("====================here======================");
+      console.log(result);
       if (result) {
         setShowAlert(true);
         setAlertMsg("Confirmation request is sent to OCH");
@@ -200,7 +202,7 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
         setTimeout(() => setShowAlert(false), 3000);
       }
     } catch (err) {
-      console.error("Error confirming task:", err);
+      // console.error("Error confirming task:", err);
     }
   };
 
@@ -210,7 +212,7 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
 
   const onNPCompleteModalOK = async (formData: NPCompleteModalData) => {
     setIsCompleteModalOpen(false);
-    console.log(selectedRow);
+    // console.log(selectedRow);
     // console.log({
     //   telephoneNumber: selectedRow?.telephoneNumber,
     //   ochOrderNumber: selectedRow?.ochOrderNumber,
@@ -239,6 +241,8 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
         throw new Error(`Failed to confirm task: ${res.statusText}`);
       }
       const result = await res.json();
+      console.log("====================here======================");
+      console.log(result);
       if (result) {
         setShowAlert(true);
         setAlertMsg("Confirmation request is sent to OCH");
@@ -251,7 +255,7 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
         setTimeout(() => setShowAlert(false), 3000);
       }
     } catch (err) {
-      console.error("Error confirming task:", err);
+      // console.error("Error confirming task:", err);
     }
   };
 

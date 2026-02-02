@@ -26,7 +26,7 @@ public class CancelRequestHandler {
     }
     public boolean handle(CancelRequest request){
         try {
-            System.out.println("===============================1======================================");
+            // System.out.println("===============================1======================================");
             Batch batch = new Batch();
             batch.setId(batchIdIO.getBatchId()); // Or use unique ID generation
             Transaction tx = new Transaction();
@@ -34,14 +34,14 @@ public class CancelRequestHandler {
             tx.setTelephoneNumber(request.getTelephoneNumber());
             tx.setOchOrderNumber(request.getOchOrderNumber());
             
-            System.out.println("===============================3======================================");
+            // System.out.println("===============================3======================================");
             tx.setUniqueId(request.getUniqueId());
             tx.setOriginatingOrderNumber(request.getOriginatingOrderNumber());
             tx.setPriority(5);
             batch.getTransactions().add(tx);
             boolean result = soapClient.getPort().send(batch);
-            System.out.println("===============================2======================================");
-            
+            System.out.println("====================here======================");
+            System.out.println("OCH Cancel send result: " + result);
             if(result){
                 batchIdIO.setBatchId(batchIdIO.getBatchId()+1);
                 try {

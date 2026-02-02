@@ -175,6 +175,8 @@ export default function Numbertable({ numbers }: NumberTableProps) {
         }),
       });
       const result = await res.json();
+      console.log("====================here======================");
+      console.log(result);
       if (result === true) {
         setShowAlert(true);
         setAlertMsg("Cancel request was sent to OCH successfully.");
@@ -202,7 +204,6 @@ export default function Numbertable({ numbers }: NumberTableProps) {
     setRejectSubmitting(true);
     try {
       const tempUniqueId = (parseInt(data.uniqueId) + 1).toString();
-      console.log(tempUniqueId, "hhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh");
 
       const res = await fetch(`${API_BASE_URL}/reject`, {
         method: "POST",
@@ -219,6 +220,8 @@ export default function Numbertable({ numbers }: NumberTableProps) {
         }),
       });
       const result = await res.json();
+      console.log("====================here======================");
+      console.log(result);
       if (result === true) {
         setShowAlert(true);
         setAlertMsg("NP Reject was sent to OCH successfully.");
@@ -272,6 +275,8 @@ export default function Numbertable({ numbers }: NumberTableProps) {
         }),
       });
       let data = await res.json();
+      console.log("====================here======================");
+      console.log(data);
       if (data !== null) {
         dispatch({ type: "UPDATE_NUMBER", payload: data });
         setShowAlert(true);
@@ -341,12 +346,14 @@ export default function Numbertable({ numbers }: NumberTableProps) {
                       }
 
                       if (column.id === "actions") {
-                        const isCurrentOperator =
+                        const isRecipientServiceOperator =
                           username && row.recipientServiceOperator === username;
+                        const isRecipientNetworkOperator =
+                          username && row.recipientNetworkOperator === username;
                         return (
                           <TableCell key={column.id} align={column.align}>
                             <div className="flex items-center justify-center gap-3">
-                              {isCurrentOperator && (
+                              {isRecipientServiceOperator && (
                                 <>
                                   <IconButton
                                     sx={{
@@ -374,7 +381,7 @@ export default function Numbertable({ numbers }: NumberTableProps) {
                                   </Tooltip>
                                 </>
                               )}
-                              {!isCurrentOperator && (
+                              {isRecipientNetworkOperator && (
                                 <Tooltip title="Cancel" arrow>
                                   <IconButton
                                     sx={{
