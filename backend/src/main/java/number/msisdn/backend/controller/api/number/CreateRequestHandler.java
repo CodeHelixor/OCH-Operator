@@ -8,7 +8,9 @@ import org.springframework.stereotype.Service;
 import number.msisdn.backend.controller.requests.CreateRequest;
 import number.msisdn.backend.controller.responses.CreateResponse;
 import number.msisdn.backend.database.entities.NumberEntity;
+import number.msisdn.backend.database.entities.TasklistEntity;
 import number.msisdn.backend.database.repositories.NumberRepository;
+import number.msisdn.backend.database.repositories.TasklistRepository;
 import number.msisdn.backend.general.BatchIdIO;
 import number.msisdn.backend.general.FileUtility;
 
@@ -24,13 +26,14 @@ public class CreateRequestHandler {
     @Autowired
     private SoapClient soapClient;
    
-    private  NumberRepository numberRepository;
-    private BatchIdIO batchIdIO;
-    // private SequenceIO sequenceIO;
-    public CreateRequestHandler(NumberRepository numberRepository, BatchIdIO batchIdIO){
+    private final NumberRepository numberRepository;
+    private final TasklistRepository tasklistRepository;
+    private final BatchIdIO batchIdIO;
+
+    public CreateRequestHandler(NumberRepository numberRepository, TasklistRepository tasklistRepository, BatchIdIO batchIdIO){
         this.numberRepository = numberRepository;
+        this.tasklistRepository = tasklistRepository;
         this.batchIdIO = batchIdIO;
-        // this.sequenceIO = sequenceIO;
     }
 
     public CreateResponse handle(CreateRequest request){
@@ -66,8 +69,26 @@ public class CreateRequestHandler {
             System.out.println("====================here======================");
             System.out.println("OCH Create send result: " + result);
             if(result){
-                // sequenceIO.setSequenceId(sequence+1);                
                 batchIdIO.setBatchId(batchIdIO.getBatchId()+1);
+
+                // Save sent transaction to tasklisttable when OCH accepts Create (001)
+                TasklistEntity taskEntity = new TasklistEntity();
+                taskEntity.setTransactionType(tx.getTransactionType());
+                taskEntity.setTelephoneNumber(tx.getTelephoneNumber());
+                taskEntity.setOchOrderNumber(tx.getOchOrderNumber());
+                taskEntity.setUniqueId(tx.getUniqueId());
+                taskEntity.setOriginatingOrderNumber(tx.getOriginatingOrderNumber());
+                taskEntity.setCurrentServiceOperator(operator);
+                taskEntity.setCurrentNetworkOperator(operator);
+                taskEntity.setRecipientServiceOperator(tx.getRecipientServiceOperator());
+                taskEntity.setRecipientNetworkOperator(tx.getRecipientNetworkOperator());
+                taskEntity.setCurrentNumberType(tx.getCurrentNumberType());
+                taskEntity.setRequestedExecutionDate(tx.getRequestedExecutionDate());
+                taskEntity.setPointOfConnection(tx.getPointOfConnection());
+                taskEntity.setIsCompleted(false);
+                taskEntity.setConfirmedExecutionDate(null);
+                taskEntity.setConfirmationStatus(null);
+                tasklistRepository.save(taskEntity);
 
                 NumberEntity numberEntity = new NumberEntity();
                 numberEntity.setOriginatingOrderNumber(operator+timestamp);

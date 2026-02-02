@@ -37,11 +37,17 @@ public class ConfirmRequestHandler {
             Batch batch = new Batch();
             batch.setId(batchIdIO.getBatchId()); // Or use unique ID generation
             //Create one transaction
+            // OCH expects uniqueId incremented by 1 for confirm (e.g. 2503434 -> 2503435)
+            String currentUniqueId = task.getUniqueId();
+            String nextUniqueId = currentUniqueId != null && !currentUniqueId.isEmpty()
+                    ? String.valueOf(Long.parseLong(currentUniqueId) + 1)
+                    : currentUniqueId;
+
             Transaction tx = new Transaction();
             tx.setTransactionType("004"); 
             tx.setTelephoneNumber(task.getTelephoneNumber());
             tx.setOchOrderNumber(task.getOchOrderNumber());
-            tx.setUniqueId(task.getUniqueId());
+            tx.setUniqueId(nextUniqueId);
             tx.setOriginatingOrderNumber(task.getOriginatingOrderNumber());
             tx.setConfirmedExecutionDate(request.getConfirmedExecutionDate());
             // System.out.println(request.getConfirmationStatus());
@@ -58,6 +64,9 @@ public class ConfirmRequestHandler {
             System.out.println("OCH Confirm send result: " + result);
             if(result){
                 batchIdIO.setBatchId(batchIdIO.getBatchId()+1);
+                if (nextUniqueId != null) {
+                    task.setUniqueId(nextUniqueId);
+                }
                 task.setConfirmedExecutionDate(request.getConfirmedExecutionDate());
                 if(request.getConfirmationStatus()!=""){
                 ConfirmationStatusEntity status = confirmationStatusRepository.findById(Long.parseLong(request.getConfirmationStatus()))

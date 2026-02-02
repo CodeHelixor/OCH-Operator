@@ -7,6 +7,8 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 import NPConfirmModal from "./modals/NPConfirmModal";
 import {
   NPCompleteModalData,
@@ -107,10 +109,13 @@ const tnsTypes = [
 //   tasks: TaskListRow[];
 // }
 
-/** Only show tasks where recipientServiceOperator is the authenticated user */
+/** Show tasks where the authenticated user is recipient (service or network operator), matching backend logic */
 function isTaskForCurrentUser(task: TaskData, operatorId: string): boolean {
   if (!operatorId) return false;
-  return task.recipientServiceOperator === operatorId;
+  return (
+    task.recipientServiceOperator === operatorId ||
+    task.recipientNetworkOperator === operatorId
+  );
 }
 
 /** Unique key for deduplication: prefer originatingOrderNumber, fallback to composite */
@@ -263,13 +268,15 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
     setIsCompleteModalOpen(false);
   };
 
-  React.useEffect(() => {
-    if (selectedRow?.transactionType == "001") {
-      setIsConfirmModalOpen(true);
-    } else if (selectedRow?.transactionType == "004") {
-      setIsCompleteModalOpen(true);
-    }
-  }, [selectedRow]);
+  const openConfirmModal = (row: TaskData) => {
+    setSelectedRow(row);
+    setIsConfirmModalOpen(true);
+  };
+
+  const openCompleteModal = (row: TaskData) => {
+    setSelectedRow(row);
+    setIsCompleteModalOpen(true);
+  };
 
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
@@ -286,6 +293,9 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
                   <span className="font-bold text-lg">{column.label}</span>
                 </TableCell>
               ))}
+              <TableCell align="center" style={{ minWidth: 180 }}>
+                <span className="font-bold text-lg">Actions</span>
+              </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -294,14 +304,9 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
               .map((row) => (
                   <TableRow
                     hover
-                    role="checkbox"
-                    tabIndex={-1}
                     key={getTaskKey(row)}
-                    onClick={() => setSelectedRow(row)}
                     style={{
-                      cursor: row.isCompleted ? "not-allowed" : "pointer",
-                      opacity: row.isCompleted ? 0.5 : 1, // visually faded
-                      pointerEvents: row.isCompleted ? "none" : "auto", // disable interactions
+                      opacity: row.isCompleted ? 0.6 : 1,
                     }}
                   >
                     {columns.map((column) => {
@@ -323,6 +328,33 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
                         </TableCell>
                       );
                     })}
+                    <TableCell align="center">
+                      <Box sx={{ display: "flex", gap: 1, justifyContent: "center", flexWrap: "wrap" }}>
+                        {row.transactionType === "001" && !row.isCompleted && (
+                          <Button
+                            variant="contained"
+                            size="small"
+                            color="primary"
+                            onClick={() => openConfirmModal(row)}
+                          >
+                            Confirm
+                          </Button>
+                        )}
+                        {row.transactionType === "004" && !row.isCompleted && (
+                          <Button
+                            variant="contained"
+                            size="small"
+                            color="secondary"
+                            onClick={() => openCompleteModal(row)}
+                          >
+                            Complete
+                          </Button>
+                        )}
+                        {row.isCompleted && (
+                          <span style={{ color: "text.secondary", fontSize: "0.875rem" }}>—</span>
+                        )}
+                      </Box>
+                    </TableCell>
                   </TableRow>
                 ))}
           </TableBody>

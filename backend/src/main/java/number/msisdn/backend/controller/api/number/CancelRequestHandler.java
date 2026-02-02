@@ -1,4 +1,5 @@
 package number.msisdn.backend.controller.api.number;
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -6,7 +7,9 @@ import org.springframework.stereotype.Service;
 
 import number.msisdn.backend.controller.requests.CancelRequest;
 import number.msisdn.backend.database.entities.NumberEntity;
+import number.msisdn.backend.database.entities.TasklistEntity;
 import number.msisdn.backend.database.repositories.NumberRepository;
+import number.msisdn.backend.database.repositories.TasklistRepository;
 import number.msisdn.backend.general.BatchIdIO;
 import number.msisdn.backend.soap.SoapClient;
 import number.msisdn.soapclient.Batch;
@@ -18,10 +21,13 @@ import number.msisdn.soapclient.UserException_Exception;
 public class CancelRequestHandler {
     @Autowired 
     private SoapClient soapClient;
-    private NumberRepository numberRepository;
-    private BatchIdIO batchIdIO;
-    public CancelRequestHandler(NumberRepository numberRepository, BatchIdIO batchIdIO){
+    private final NumberRepository numberRepository;
+    private final TasklistRepository tasklistRepository;
+    private final BatchIdIO batchIdIO;
+
+    public CancelRequestHandler(NumberRepository numberRepository, TasklistRepository tasklistRepository, BatchIdIO batchIdIO){
         this.numberRepository = numberRepository;
+        this.tasklistRepository = tasklistRepository;
         this.batchIdIO = batchIdIO;
     }
     public boolean handle(CancelRequest request){
@@ -44,17 +50,8 @@ public class CancelRequestHandler {
             System.out.println("OCH Cancel send result: " + result);
             if(result){
                 batchIdIO.setBatchId(batchIdIO.getBatchId()+1);
-                try {
-                    Optional<NumberEntity> numberEntity= numberRepository.findByOriginatingOrderNumber(request.getOriginatingOrderNumber());
-                    if (numberEntity.isPresent()) {
-                        numberRepository.delete(numberEntity.get());
-                        return true;
-                    } else {
-                        return false; // Not found
-                    }
-                } catch (Exception e) {
-                    return false;
-                }
+                removeRelatedData(request.getOriginatingOrderNumber());
+                return true;
             }
             return false;
         }catch (UserException_Exception | UnavailableException_Exception e) {
@@ -64,6 +61,28 @@ public class CancelRequestHandler {
             e.printStackTrace();
             return false;
         }     
+    }
+
+    /**
+     * Removes number and tasklist records linked to the given originating order number.
+     * Called when OCH Cancel send result is true so tasklisttable stays consistent.
+     */
+    private void removeRelatedData(String originatingOrderNumber) {
+        if (originatingOrderNumber == null || originatingOrderNumber.isEmpty()) {
+            return;
+        }
+        try {
+            Optional<NumberEntity> numberOpt = numberRepository.findByOriginatingOrderNumber(originatingOrderNumber);
+            if (numberOpt.isPresent()) {
+                numberRepository.delete(numberOpt.get());
+            }
+            List<TasklistEntity> tasklists = tasklistRepository.findByOriginatingOrderNumber(originatingOrderNumber);
+            if (!tasklists.isEmpty()) {
+                tasklistRepository.deleteAll(tasklists);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }
    

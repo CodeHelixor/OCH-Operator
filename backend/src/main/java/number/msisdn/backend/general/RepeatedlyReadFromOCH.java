@@ -86,40 +86,49 @@ public class RepeatedlyReadFromOCH {
 
     public void processBatch(Batch batch){
         List<Transaction> transactions = batch.getTransactions();
+        if (transactions == null) return;
         for(int i = 0; i < transactions.size(); i++){
             Transaction transaction = transactions.get(i);
-            switch (transaction.getTransactionType()) {
-                case "001": //<NP Create>
-                    // Idempotency: skip if already processed (prevents duplicate saves from OCH retries)
+            String transactionType = transaction.getTransactionType() != null ? transaction.getTransactionType().trim() : null;
+            switch (transactionType != null ? transactionType : "") {
+                case "001": //<NP Create> - always save to tasklisttable with all transaction fields
+                    // Task idempotency: only create task if we don't already have one for this order
+                    List<TasklistEntity> existingTasks = tasklistRepository.findByOriginatingOrderNumber(transaction.getOriginatingOrderNumber());
+                    if (existingTasks.isEmpty()) {
+                        TasklistEntity taskEntity = new TasklistEntity();
+                        taskEntity.setTransactionType(transaction.getTransactionType());
+                        taskEntity.setTelephoneNumber(transaction.getTelephoneNumber());
+                        taskEntity.setOchOrderNumber(transaction.getOchOrderNumber());
+                        taskEntity.setUniqueId(transaction.getUniqueId());
+                        taskEntity.setOriginatingOrderNumber(transaction.getOriginatingOrderNumber());
+                        taskEntity.setCurrentServiceOperator(transaction.getCurrentServiceOperator());
+                        taskEntity.setCurrentNetworkOperator(transaction.getCurrentNetworkOperator());
+                        taskEntity.setRecipientServiceOperator(transaction.getRecipientServiceOperator());
+                        taskEntity.setRecipientNetworkOperator(transaction.getRecipientNetworkOperator());
+                        taskEntity.setCurrentNumberType(transaction.getCurrentNumberType());
+                        taskEntity.setRequestedExecutionDate(transaction.getRequestedExecutionDate());
+                        taskEntity.setPointOfConnection(transaction.getPointOfConnection());
+                        taskEntity.setIsCompleted(false);
+                        taskEntity.setConfirmedExecutionDate(transaction.getConfirmedExecutionDate());
+                        taskEntity.setConfirmationStatus(null);
+                        tasklistRepository.save(taskEntity);
+                    }
+
+                    // Number: skip if already processed (idempotency) or if phone already exists for our operator
                     if (numberRepository.findByOriginatingOrderNumber(transaction.getOriginatingOrderNumber()).isPresent()) {
                         break;
                     }
-                    // Skip if this phone number already exists for our operator (prevents duplicate display in UI)
                     try {
                         String operator = FileUtility.readOperator();
                         List<NumberEntity> existingByPhone = numberRepository.findByTelephoneNumber(transaction.getTelephoneNumber());
-                        boolean phoneAlreadyExists = existingByPhone.stream()
+                        boolean phoneAlreadyExists = existingByPhone != null && existingByPhone.stream()
                                 .anyMatch(n -> operator.equals(n.getRecipientServiceOperator()) || operator.equals(n.getRecipientNetworkOperator()));
                         if (phoneAlreadyExists) {
                             break;
                         }
                     } catch (Exception e) {
-                        // If operator read fails, proceed with insert
+                        // If operator read fails, proceed with number insert
                     }
-                    TasklistEntity taskEntity = new TasklistEntity();
-                    taskEntity.setTransactionType(transaction.getTransactionType());
-                    taskEntity.setTelephoneNumber(transaction.getTelephoneNumber());
-                    taskEntity.setOchOrderNumber(transaction.getOchOrderNumber());
-                    taskEntity.setUniqueId(transaction.getUniqueId());
-                    taskEntity.setOriginatingOrderNumber(transaction.getOriginatingOrderNumber());
-                    taskEntity.setCurrentServiceOperator(transaction.getCurrentServiceOperator());
-                    taskEntity.setRecipientServiceOperator(transaction.getRecipientServiceOperator());
-                    taskEntity.setRecipientNetworkOperator(transaction.getRecipientNetworkOperator());
-                    taskEntity.setCurrentNumberType(transaction.getCurrentNumberType());
-                    taskEntity.setRequestedExecutionDate(transaction.getRequestedExecutionDate());
-                    taskEntity.setPointOfConnection(transaction.getPointOfConnection());
-                    tasklistRepository.save(taskEntity);
-
                     NumberEntity numberEntity = new NumberEntity();
                     numberEntity.setTelephoneNumber(transaction.getTelephoneNumber());
                     numberEntity.setOchOrderNumber(transaction.getOchOrderNumber());
@@ -185,6 +194,14 @@ public class RepeatedlyReadFromOCH {
                             newNotifyEntity.setNotifyType("success");
                             newNotifyEntity.setNotify("NP Create request is successfully sent.");
                             notifyRepository.save(newNotifyEntity);
+
+                            // Update tasklisttable with ochOrderNumber and uniqueId so task has all data
+                            List<TasklistEntity> tasklists002 = tasklistRepository.findByOriginatingOrderNumber(transaction.getOriginatingOrderNumber());
+                            for (TasklistEntity task : tasklists002) {
+                                task.setOchOrderNumber(transaction.getOchOrderNumber());
+                                task.setUniqueId(transaction.getUniqueId());
+                                tasklistRepository.save(task);
+                            }
                             break;
                         }
                     } catch (Exception e) {
