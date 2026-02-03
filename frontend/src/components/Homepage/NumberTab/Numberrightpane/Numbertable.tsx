@@ -77,9 +77,11 @@ function createData(
   return { id, msisdn, regdate, moddate, status };
 }
 
+/** Resolve the operator to compare with logged-in user (Reject vs Trash). Uses recipientServiceOperator (DB: recipient_service_operator). */
 function getCurrentServiceOperator(row: NumberData): string {
-  const v = row.currentServiceOperator;
-  return (typeof v === "object" && v && "value" in v ? (v as { value: string }).value : v) ?? "";
+  const raw = row.recipientServiceOperator ?? row.currentServiceOperator;
+  const v = typeof raw === "object" && raw && "value" in raw ? (raw as { value: string }).value : raw;
+  return (v ?? "").trim();
 }
 
 export default function Numbertable({ numbers }: NumberTableProps) {
@@ -340,9 +342,11 @@ export default function Numbertable({ numbers }: NumberTableProps) {
                       }
 
                       if (column.id === "actions") {
-                        const currentOp = getCurrentServiceOperator(row).trim();
-                        const showReject = Boolean(username && currentOp && currentOp === username);
-                        const showCancel = !currentOp;
+                        const currentOp = getCurrentServiceOperator(row);
+                        const loggedInOp = (username ?? "").trim();
+                        // Reject when recipient_service_operator is the logged-in user; otherwise show Cancel (trash).
+                        const showReject = Boolean(loggedInOp && currentOp && currentOp === loggedInOp);
+                        const showCancel = !showReject;
                         return (
                           <TableCell key={column.id} align={column.align}>
                             <div className="flex items-center justify-center gap-3">
