@@ -344,9 +344,9 @@ export default function Numbertable({ numbers }: NumberTableProps) {
                       if (column.id === "actions") {
                         const currentOp = getCurrentServiceOperator(row);
                         const loggedInOp = (username ?? "").trim();
-                        // Reject when recipient_service_operator is the logged-in user; otherwise show Cancel (trash).
-                        const showReject = Boolean(loggedInOp && currentOp && currentOp === loggedInOp);
-                        const showCancel = !showReject;
+                        // Trash when recipient_service_operator is the logged-in user; Reject when it is not.
+                        const showCancel = Boolean(loggedInOp && currentOp && currentOp === loggedInOp);
+                        const showReject = !showCancel;
                         return (
                           <TableCell key={column.id} align={column.align}>
                             <div className="flex items-center justify-center gap-3">
