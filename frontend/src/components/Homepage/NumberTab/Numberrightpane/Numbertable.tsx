@@ -8,7 +8,6 @@ import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import IconButton from "@mui/material/IconButton";
-import EditIcon from "@mui/icons-material/Edit";
 import BlockIcon from "@mui/icons-material/Block";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Tooltip from "@mui/material/Tooltip";
@@ -78,12 +77,9 @@ function createData(
   return { id, msisdn, regdate, moddate, status };
 }
 
-function isNumberForOperator(row: NumberData, operatorId: string): boolean {
-  if (!operatorId) return false;
-  return (
-    row.recipientServiceOperator === operatorId ||
-    row.recipientNetworkOperator === operatorId
-  );
+function getCurrentServiceOperator(row: NumberData): string {
+  const v = row.currentServiceOperator;
+  return (typeof v === "object" && v && "value" in v ? (v as { value: string }).value : v) ?? "";
 }
 
 export default function Numbertable({ numbers }: NumberTableProps) {
@@ -104,10 +100,8 @@ export default function Numbertable({ numbers }: NumberTableProps) {
   >("success");
 
   const visibleNumbers = React.useMemo(() => {
-    if (!username) return [];
-    const filtered = numbers.filter((n) => isNumberForOperator(n, username));
-    // Deduplicate by telephoneNumber: keep most recent (highest id)
-    const sorted = [...filtered].sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
+    // Show all numbers; deduplicate by telephoneNumber, keep most recent (highest id)
+    const sorted = [...numbers].sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
     const seenPhones = new Set<string>();
     return sorted.filter((n) => {
       const phone = n.telephoneNumber;
@@ -115,7 +109,7 @@ export default function Numbertable({ numbers }: NumberTableProps) {
       seenPhones.add(phone);
       return true;
     });
-  }, [numbers, username]);
+  }, [numbers]);
 
   React.useEffect(() => {
     setLocalNumbers(visibleNumbers);
@@ -346,42 +340,30 @@ export default function Numbertable({ numbers }: NumberTableProps) {
                       }
 
                       if (column.id === "actions") {
-                        const isRecipientServiceOperator =
-                          username && row.recipientServiceOperator === username;
-                        const isRecipientNetworkOperator =
-                          username && row.recipientNetworkOperator === username;
+                        const currentOp = getCurrentServiceOperator(row).trim();
+                        const showReject = Boolean(username && currentOp && currentOp === username);
+                        const showCancel = !currentOp;
                         return (
                           <TableCell key={column.id} align={column.align}>
                             <div className="flex items-center justify-center gap-3">
-                              {isRecipientServiceOperator && (
-                                <>
+                              {showReject && (
+                                <Tooltip title="Reject" arrow>
                                   <IconButton
                                     sx={{
-                                      color: "black",
-                                      "&:hover": { color: "red" },
+                                      color: "#d32f2f",
+                                      "&:hover": {
+                                        color: "#b71c1c",
+                                        backgroundColor: "rgba(211, 47, 47, 0.08)",
+                                      },
                                     }}
-                                    // onClick={() => openEditModal(row)}
+                                    onClick={() => openRejectModal(row)}
+                                    aria-label="Reject flow"
                                   >
-                                    <EditIcon />
+                                    <BlockIcon />
                                   </IconButton>
-                                  <Tooltip title="Reject" arrow>
-                                    <IconButton
-                                      sx={{
-                                        color: "#d32f2f",
-                                        "&:hover": {
-                                          color: "#b71c1c",
-                                          backgroundColor: "rgba(211, 47, 47, 0.08)",
-                                        },
-                                      }}
-                                      onClick={() => openRejectModal(row)}
-                                      aria-label="Reject flow"
-                                    >
-                                      <BlockIcon />
-                                    </IconButton>
-                                  </Tooltip>
-                                </>
+                                </Tooltip>
                               )}
-                              {isRecipientNetworkOperator && (
+                              {showCancel && (
                                 <Tooltip title="Cancel" arrow>
                                   <IconButton
                                     sx={{

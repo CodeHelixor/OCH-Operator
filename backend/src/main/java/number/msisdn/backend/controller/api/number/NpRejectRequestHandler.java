@@ -70,7 +70,7 @@ public class NpRejectRequestHandler {
             System.out.println("====================here======================");
             System.out.println("OCH NpReject send result: " + result);
             if (result) {
-                batchIdIO.setBatchId(batchIdIO.getBatchId() + 1);
+                batchIdIO.setBatchId(batchIdIO.getBatchId());
                 removeRelatedData(request.getOriginatingOrderNumber());
                 return true;
             }

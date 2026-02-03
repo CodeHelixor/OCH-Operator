@@ -10,7 +10,6 @@ import org.springframework.stereotype.Service;
 
 import number.msisdn.backend.database.entities.NumberEntity;
 import number.msisdn.backend.database.repositories.NumberRepository;
-import number.msisdn.backend.general.FileUtility;
 
 @Service
 public class GetNumberRequestHandler {
@@ -21,14 +20,12 @@ public class GetNumberRequestHandler {
     }
 
     /**
-     * Returns numbers for the operator, deduplicated by telephone number.
-     * When duplicates exist, keeps the most recent record (highest id).
+     * Returns all numbers, deduplicated by telephone number.
+     * Display does not filter by recipient; when duplicates exist, keeps the most recent record (highest id).
      */
     public List<NumberEntity> handle() {
         try {
-            String operator = FileUtility.readOperator();
-            List<NumberEntity> allNumbers = numberRepository.findByRecipientOperatorOrderByIdDesc(operator);
-            // Deduplicate by telephoneNumber: keep first occurrence (already sorted by id DESC = most recent first)
+            List<NumberEntity> allNumbers = numberRepository.findAllByOrderByIdDesc();
             Map<String, NumberEntity> uniqueByPhone = new LinkedHashMap<>();
             for (NumberEntity n : allNumbers) {
                 String phone = n.getTelephoneNumber();

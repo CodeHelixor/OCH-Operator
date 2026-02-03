@@ -109,15 +109,6 @@ const tnsTypes = [
 //   tasks: TaskListRow[];
 // }
 
-/** Show tasks where the authenticated user is recipient (service or network operator), matching backend logic */
-function isTaskForCurrentUser(task: TaskData, operatorId: string): boolean {
-  if (!operatorId) return false;
-  return (
-    task.recipientServiceOperator === operatorId ||
-    task.recipientNetworkOperator === operatorId
-  );
-}
-
 /** Unique key for deduplication: prefer originatingOrderNumber, fallback to composite */
 function getTaskKey(task: TaskData): string {
   if (task.originatingOrderNumber) return task.originatingOrderNumber;
@@ -140,10 +131,8 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
   >("success");
 
   const visibleTasks = React.useMemo(() => {
-    if (!username) return [];
-    const filtered = tasks.filter((t) => isTaskForCurrentUser(t, username));
     // Deduplicate: keep most recent (highest id) per unique task
-    const sorted = [...filtered].sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
+    const sorted = [...tasks].sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
     const seen = new Set<string>();
     return sorted.filter((t) => {
       const key = getTaskKey(t);
@@ -151,7 +140,7 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
       seen.add(key);
       return true;
     });
-  }, [tasks, username]);
+  }, [tasks]);
 
   React.useEffect(() => {
     const maxPage = Math.max(0, Math.ceil(visibleTasks.length / rowsPerPage) - 1);
@@ -335,6 +324,7 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
                             variant="contained"
                             size="small"
                             color="primary"
+                            disabled={row.recipientServiceOperator === username}
                             onClick={() => openConfirmModal(row)}
                           >
                             Confirm

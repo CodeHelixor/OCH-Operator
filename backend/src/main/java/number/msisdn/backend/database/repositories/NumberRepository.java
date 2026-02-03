@@ -12,6 +12,8 @@ public interface NumberRepository extends JpaRepository<NumberEntity, Long> {
     Optional<NumberEntity> findByOriginatingOrderNumber(String originatingOrderNumber);
     List<NumberEntity> findByTelephoneNumber(String telephoneNumber);
 
+    List<NumberEntity> findAllByOrderByIdDesc();
+
     @Query("SELECT n FROM NumberEntity n WHERE n.recipientServiceOperator = :operator OR n.recipientNetworkOperator = :operator ORDER BY n.id DESC")
     List<NumberEntity> findByRecipientOperatorOrderByIdDesc(@Param("operator") String operator);
 }

@@ -224,6 +224,7 @@ public class RepeatedlyReadFromOCH {
                     List<TasklistEntity> tasklists = tasklistRepository.findByOriginatingOrderNumber(transaction.getOriginatingOrderNumber());
                     if(tasklists.size() != 0){  //in the case of when NP Confirmation task already exist in RecipientOperator
                         TasklistEntity task = tasklists.get(0);
+                        task.setTransactionType("004"); // change 001->004 so UI shows COMPLETE instead of CONFIRM
                         task.setConfirmedExecutionDate(transaction.getConfirmedExecutionDate());
                         task.setUniqueId(transaction.getUniqueId());
                         if(transaction.getConfirmationStatus()!=null){
