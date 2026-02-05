@@ -40,7 +40,7 @@ public class ConfirmRequestHandler {
             // OCH expects uniqueId incremented by 1 for confirm (e.g. 2503434 -> 2503435)
             String currentUniqueId = task.getUniqueId();
             String nextUniqueId = currentUniqueId != null && !currentUniqueId.isEmpty()
-                    ? String.valueOf(Long.parseLong(currentUniqueId))
+                    ? String.valueOf(Long.parseLong(currentUniqueId) + 1)
                     : currentUniqueId;
 
             Transaction tx = new Transaction();
