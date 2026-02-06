@@ -170,7 +170,6 @@ const RejectModal: React.FC<RejectModalProps> = ({
           onClick={handleSubmit}
           color="error"
           variant="contained"
-          disabled={isSubmitting}
           aria-label="Reject flow"
         >
           {isSubmitting ? "Sending…" : "Reject"}

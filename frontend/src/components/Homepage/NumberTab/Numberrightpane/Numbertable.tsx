@@ -77,9 +77,9 @@ function createData(
   return { id, msisdn, regdate, moddate, status };
 }
 
-/** Resolve the operator to compare with logged-in user (Reject vs Trash). Uses recipientServiceOperator (DB: recipient_service_operator). */
-function getCurrentServiceOperator(row: NumberData): string {
-  const raw = row.recipientServiceOperator ?? row.currentServiceOperator;
+/** Resolve the operator to compare with logged-in user (Reject vs Trash). Uses recipientNetworkOperator (DB: recipient_network_operator). */
+function getCurrentNetworkOperator(row: NumberData): string {
+  const raw = row.recipientNetworkOperator ?? row.currentServiceOperator;
   const v = typeof raw === "object" && raw && "value" in raw ? (raw as { value: string }).value : raw;
   return (v ?? "").trim();
 }
@@ -340,9 +340,9 @@ export default function Numbertable({ numbers }: NumberTableProps) {
                       }
 
                       if (column.id === "actions") {
-                        const currentOp = getCurrentServiceOperator(row);
+                        const currentOp = getCurrentNetworkOperator(row);
                         const loggedInOp = (username ?? "").trim();
-                        // Trash when recipient_service_operator is the logged-in user; Reject when it is not.
+                        // Trash when recipient_network_operator is the logged-in user; Reject when it is not.
                         const showCancel = Boolean(loggedInOp && currentOp && currentOp === loggedInOp);
                         const showReject = !showCancel;
                         return (

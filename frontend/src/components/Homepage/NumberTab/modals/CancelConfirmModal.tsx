@@ -52,7 +52,6 @@ const CancelConfirmModal: React.FC<CancelConfirmModalProps> = ({
           onClick={onApply}
           color="primary"
           variant="contained"
-          disabled={isSubmitting}
           aria-label="Apply cancel"
         >
           {isSubmitting ? "Sending…" : "Apply"}

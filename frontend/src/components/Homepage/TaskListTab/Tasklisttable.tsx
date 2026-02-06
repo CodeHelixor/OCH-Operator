@@ -324,7 +324,7 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
                             variant="contained"
                             size="small"
                             color="primary"
-                            disabled={row.recipientServiceOperator === username}
+                            disabled={row.recipientNetworkOperator === username}
                             onClick={() => openConfirmModal(row)}
                           >
                             Confirm
