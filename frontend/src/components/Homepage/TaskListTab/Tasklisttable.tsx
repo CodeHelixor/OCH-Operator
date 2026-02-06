@@ -335,6 +335,7 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
                             variant="contained"
                             size="small"
                             color="secondary"
+                            disabled={row.recipientNetworkOperator !== username}
                             onClick={() => openCompleteModal(row)}
                           >
                             Complete
