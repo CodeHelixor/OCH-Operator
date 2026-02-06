@@ -46,7 +46,9 @@ public class CompletionRequestHandler {
             tx.setTransactionType("008"); // Typically "001" = Add/Port
             tx.setTelephoneNumber(request.getTelephoneNumber());
             tx.setOchOrderNumber(request.getOchOrderNumber());
-            tx.setUniqueId(request.getUniqueId());
+            // UniqueId needs to be decremented by 1 when sending to OCH
+            long uniqueIdValue = Long.parseLong(request.getUniqueId()) - 1;
+            tx.setUniqueId(String.valueOf(uniqueIdValue));
             tx.setOriginatingOrderNumber(request.getOriginatingOrderNumber());
             tx.setRecipientNetworkOperator(request.getRecipientNetworkOperator());
             tx.setRecipientServiceOperator(request.getRecipientServiceOperator());
