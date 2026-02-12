@@ -29,8 +29,9 @@ export default function AlertComponent({
     <div
       style={{
         position: "fixed",
-        bottom: "50px",
-        right: "50px",
+        top: "20px",
+        left: "50%",
+        transform: "translateX(-50%)",
         zIndex: 1000, // ensure it’s above other UI
       }}
     >

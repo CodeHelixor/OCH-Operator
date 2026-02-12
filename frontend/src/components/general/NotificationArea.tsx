@@ -13,7 +13,17 @@ export default function NotificationArea() {
   if (!notification) return null;
 
   return (
-    <div className="min-w-[200px] max-w-[360px] flex-shrink-0 flex items-center justify-end">
+    <div
+      style={{
+        position: "fixed",
+        top: "20px",
+        left: "50%",
+        transform: "translateX(-50%)",
+        zIndex: 1000,
+        minWidth: "200px",
+        maxWidth: "360px",
+      }}
+    >
       <Fade in={true} timeout={{ enter: 300, exit: 400 }}>
         <Alert variant="filled" severity={notification.severity}>
           {notification.message}
