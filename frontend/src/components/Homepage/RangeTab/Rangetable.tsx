@@ -7,8 +7,10 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import { Collapse } from "@mui/material";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Stack from "@mui/material/Stack";
+import TextField from "@mui/material/TextField";
 import { RangeData, RangeTableProps } from "./types";
 
 interface Column {
@@ -120,18 +122,24 @@ const columns: readonly Column[] = [
   },
 ];
 
-const Rangetable = ({ ranges }: RangeTableProps) => {
+const Rangetable = ({ ranges, onSearch }: RangeTableProps) => {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const [localRanges, setLocalRanges] = React.useState<RangeData[]>([]);
-  // const [expandedRowId, setExpandedRowId] = React.useState<number | null>(null);
-
-  const API_BASE_URL =
-    window._env_?.REACT_APP_API_BASE_URL || "http://localhost:8080";
+  const [phoneStart, setPhoneStart] = React.useState("");
+  const [phoneEnd, setPhoneEnd] = React.useState("");
 
   React.useEffect(() => {
     setLocalRanges(ranges);
   }, [ranges]);
+
+  const handleSearch = () => {
+    onSearch?.(phoneStart, phoneEnd);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") handleSearch();
+  };
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -146,6 +154,36 @@ const Rangetable = ({ ranges }: RangeTableProps) => {
 
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
+      <Box sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}>
+        <Stack
+          direction="row"
+          spacing={2}
+          alignItems="center"
+          justifyContent="flex-end"
+          flexWrap="wrap"
+          useFlexGap
+        >
+          <TextField
+            label="Phone Number Start"
+            size="small"
+            value={phoneStart}
+            onChange={(e) => setPhoneStart(e.target.value)}
+            onKeyDown={handleKeyDown}
+            sx={{ minWidth: 180 }}
+          />
+          <TextField
+            label="Phone Number End"
+            size="small"
+            value={phoneEnd}
+            onChange={(e) => setPhoneEnd(e.target.value)}
+            onKeyDown={handleKeyDown}
+            sx={{ minWidth: 180 }}
+          />
+          <Button variant="contained" onClick={handleSearch}>
+            Search
+          </Button>
+        </Stack>
+      </Box>
       <TableContainer sx={{ maxHeight: 440 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>

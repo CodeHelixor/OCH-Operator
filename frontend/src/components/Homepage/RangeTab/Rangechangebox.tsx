@@ -297,13 +297,13 @@ const Rangechangebox = () => {
   };
 
   return (
-    <div className="flex items-center justify-center mt-10">
-      <div className="w-[90%] lg:w-[50%]">
+    <div className="mt-10 w-full">
+      <div className="w-full">
         <Box sx={{ flexGrow: 1 }}>
           <Grid container spacing={2}>
             <Grid
               size={12}
-              sx={{ display: "flex", justifyContent: "flex-end" }}
+              sx={{ display: "flex", justifyContent: "flex-start" }}
             >
               <Link href="#" underline="always" onClick={handleReset}>
                 Reset
