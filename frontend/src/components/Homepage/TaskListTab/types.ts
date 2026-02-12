@@ -25,10 +25,13 @@ export interface ConfirmationStatus {
 export interface TaskTabProps {
   visible: string;
   tasks: TaskData[];
+  numbers?: { telephoneNumber: string }[];
 }
 
 export interface TaskTableProps {
   tasks: TaskData[];
+  /** When provided, only tasks whose telephoneNumber exists in this list are shown. */
+  numbers?: { telephoneNumber: string }[];
 }
 
 export interface NPConfirmationModalData {

@@ -237,7 +237,7 @@ export default function Hometab() {
           visible={value === 1 ? "block" : "none"}
           onSearch={handleRangeSearch}
         />
-        <Tasklisttab tasks={tasks} visible={value === 2 ? "block" : "none"} />
+        <Tasklisttab tasks={tasks} numbers={numbers} visible={value === 2 ? "block" : "none"} />
         <Errortab errors={errors} visible={value === 3 ? "block" : "none"} />
       </div>
     );

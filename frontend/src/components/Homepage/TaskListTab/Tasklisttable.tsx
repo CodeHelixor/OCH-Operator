@@ -116,7 +116,7 @@ function getTaskKey(task: TaskData): string {
   return `${task.telephoneNumber}|${task.transactionType}|${task.requestedExecutionDate}|${task.recipientNetworkOperator}`;
 }
 
-export default function Tasklisttable({ tasks }: TaskTableProps) {
+export default function Tasklisttable({ tasks, numbers }: TaskTableProps) {
   const { username } = useAuth();
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -131,16 +131,29 @@ export default function Tasklisttable({ tasks }: TaskTableProps) {
   >("success");
 
   const visibleTasks = React.useMemo(() => {
-    // Deduplicate: keep most recent (highest id) per unique task
+    // Set of telephone numbers that exist in the number table (show only tasks for these)
+    const numbersInTable =
+      numbers != null && numbers.length > 0
+        ? new Set(
+            numbers
+              .map((n) => n.telephoneNumber)
+              .filter((p): p is string => p != null && p !== "")
+          )
+        : null;
+
+    // Deduplicate: keep most recent (highest id) per unique task; only include tasks whose number exists in number table
     const sorted = [...tasks].sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
     const seen = new Set<string>();
     return sorted.filter((t) => {
       const key = getTaskKey(t);
       if (seen.has(key)) return false;
       seen.add(key);
+      if (numbersInTable != null && t.telephoneNumber != null) {
+        if (!numbersInTable.has(t.telephoneNumber)) return false;
+      }
       return true;
     });
-  }, [tasks]);
+  }, [tasks, numbers]);
 
   React.useEffect(() => {
     const maxPage = Math.max(0, Math.ceil(visibleTasks.length / rowsPerPage) - 1);
