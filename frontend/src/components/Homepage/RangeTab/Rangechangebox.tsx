@@ -114,8 +114,8 @@ const Rangechangebox = () => {
       newNumberType: "",
     };
 
-    // [DISABLED] Set to true to re-enable all validation conditions below.
-    const VALIDATIONS_ENABLED = false;
+    // Set to false to disable all validation conditions below.
+    const VALIDATIONS_ENABLED = true;
     if (!VALIDATIONS_ENABLED) {
       setErrors(newErrors);
       return true;
