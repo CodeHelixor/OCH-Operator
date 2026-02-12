@@ -179,15 +179,16 @@ export default function Errortable({ errors }: ErrorTableProps) {
                           );
                         }
                         if (column.id == "isViewed") {
-                          return row[column.id] ? (
+                          return (
                             <TableCell key={column.id} align={column.align}>
-                              <VisibilityIcon />
+                              <VisibilityIcon
+                                sx={{
+                                  color: row[column.id]
+                                    ? "success.main"
+                                    : "text.primary",
+                                }}
+                              />
                             </TableCell>
-                          ) : (
-                            <TableCell
-                              key={column.id}
-                              align={column.align}
-                            ></TableCell>
                           );
                         } else {
                           const value = (row as any)[column.id];
