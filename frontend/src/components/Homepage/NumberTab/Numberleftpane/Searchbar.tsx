@@ -21,12 +21,19 @@ export default function Searchbar({
 }: SearchbarProps) {
   return (
     <div>
-      <p className="flex items-start font-semibold text-xl mb-3">
+      <p className="flex items-start font-semibold text-xl mb-3 text-slate-800">
         Search Range
       </p>
       <Paper
         component="form"
-        sx={{ p: "2px 4px", display: "flex", alignItems: "center" }}
+        sx={{
+          p: "2px 4px",
+          display: "flex",
+          alignItems: "center",
+          borderRadius: 2,
+          boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
+          border: "1px solid rgba(148, 163, 184, 0.3)",
+        }}
         onSubmit={(e) => e.preventDefault()}
       >
         <InputBase

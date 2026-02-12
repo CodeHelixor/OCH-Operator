@@ -67,8 +67,8 @@ const LoginPage = () => {
     }
   };
   return (
-    <div className="flex items-center justify-center mt-32">
-      <div className="px-6 py-10 bg-white w-[70%] rounded-2xl shadow-2xl md:w-[60%] lg:w-[50%], xl:w-[35%] ">
+    <div className="flex items-center justify-center mt-32 animate-fade-in">
+      <div className="px-6 py-10 bg-surface-card w-[70%] rounded-2xl shadow-modal border border-slate-200/60 md:w-[60%] lg:w-[50%] xl:w-[35%] animate-modal-content-in">
         <Logininputfield
           label="Username"
           value={username}

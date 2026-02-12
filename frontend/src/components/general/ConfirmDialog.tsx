@@ -40,13 +40,14 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
       onClose={onClose}
       aria-labelledby="confirm-dialog-title"
       aria-describedby="confirm-dialog-description"
+      PaperProps={{ sx: { borderRadius: 2 } }}
     >
       <DialogTitle id="confirm-dialog-title">{title}</DialogTitle>
       <DialogContent>
         <Typography id="confirm-dialog-description">{description}</Typography>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="inherit">
+        <Button onClick={onClose} variant="outlined" color="secondary">
           Cancel
         </Button>
         <Button onClick={onConfirm} color="error" variant="contained">

@@ -116,7 +116,7 @@ const RejectModal: React.FC<RejectModalProps> = ({
         NP Reject (TransactionType 006)
       </DialogTitle>
       <DialogContent>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-slate-600 mb-4">
           Send an NP Reject transaction to OCH for this NP Create request. Fill in the reject code and reason.
         </p>
         <Grid container spacing={2}>
@@ -163,7 +163,12 @@ const RejectModal: React.FC<RejectModalProps> = ({
         </Grid>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2, pt: 1 }}>
-        <Button onClick={onClose} color="inherit" disabled={isSubmitting}>
+        <Button
+          onClick={onClose}
+          variant="outlined"
+          color="secondary"
+          disabled={isSubmitting}
+        >
           Cancel
         </Button>
         <Button
@@ -171,6 +176,7 @@ const RejectModal: React.FC<RejectModalProps> = ({
           color="error"
           variant="contained"
           aria-label="Reject flow"
+          disabled={isSubmitting}
         >
           {isSubmitting ? "Sending…" : "Reject"}
         </Button>

@@ -139,12 +139,14 @@ const NPConfirmModal: React.FC<ModalProps> = ({
     };
 
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center bg-black/50"
-      style={{ zIndex: 3 }}
-    >
-      <div className="bg-white p-6 rounded-lg w-[400px] max-w-[90%]">
-        <h2 className="text-xl mb-4">Confirm this request?</h2>
+    <div className="modal-overlay" style={{ zIndex: 1300 }}>
+      <div
+        className="modal-content p-6 w-[400px] max-w-[90%]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-xl font-bold mb-4 text-slate-800">
+          Confirm this request?
+        </h2>
         <Grid container spacing={2}>
           <Grid size={12}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -247,14 +249,16 @@ const NPConfirmModal: React.FC<ModalProps> = ({
 
         <div className="flex justify-end gap-3 mt-7">
           <button
+            type="button"
             onClick={onNPConfirmModalCancel}
-            className="px-4 py-2 bg-gray-300 rounded"
+            className="btn-secondary"
           >
             Cancel
           </button>
           <button
+            type="button"
             onClick={() => onConfirm()}
-            className="px-4 py-2 bg-blue-500 text-white rounded"
+            className="btn-primary"
           >
             Confirm
           </button>

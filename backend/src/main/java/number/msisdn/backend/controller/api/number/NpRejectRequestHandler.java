@@ -12,6 +12,7 @@ import number.msisdn.backend.database.entities.TasklistEntity;
 import number.msisdn.backend.database.repositories.NumberRepository;
 import number.msisdn.backend.database.repositories.TasklistRepository;
 import number.msisdn.backend.general.BatchIdIO;
+import number.msisdn.backend.general.OCHResponseLogger;
 import number.msisdn.backend.soap.SoapClient;
 import number.msisdn.soapclient.Batch;
 import number.msisdn.soapclient.Reject;
@@ -72,9 +73,9 @@ public class NpRejectRequestHandler {
             tx.getRejects().add(reject);
 
             batch.getTransactions().add(tx);
+            OCHResponseLogger.logSentBatch(batch, "NP Reject (006)");
             boolean result = soapClient.getPort().send(batch);
-            System.out.println("====================here======================");
-            System.out.println("OCH NpReject send result: " + result);
+            OCHResponseLogger.logOperationResult("SEND (NP Reject 006)", result);
             if (result) {
                 batchIdIO.setBatchId(batchIdIO.getBatchId());
                 removeRelatedData(request.getOriginatingOrderNumber());
@@ -82,9 +83,10 @@ public class NpRejectRequestHandler {
             }
             return false;
         } catch (UserException_Exception | UnavailableException_Exception e) {
+            OCHResponseLogger.logException("SEND (NP Reject 006)", e);
             return false;
         } catch (Exception e) {
-            e.printStackTrace();
+            OCHResponseLogger.logException("SEND (NP Reject 006)", e);
             return false;
         }
     }

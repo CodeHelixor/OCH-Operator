@@ -100,12 +100,12 @@ const Importmodal: React.FC<ModalProps> = ({
     };
 
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center bg-black/50"
-      style={{ zIndex: 3 }}
-    >
-      <div className="bg-white p-6 rounded-lg">
-        <h2 className="text-xl mb-4">Import Number</h2>
+    <div className="modal-overlay" style={{ zIndex: 1300 }}>
+      <div
+        className="modal-content p-6 w-full max-w-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-xl font-bold mb-4 text-slate-800">Import Number</h2>
         <Grid container spacing={2}>
           <Grid size={6}>
             <TextField
@@ -206,16 +206,18 @@ const Importmodal: React.FC<ModalProps> = ({
           </Grid>
         </Grid>
 
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end gap-3 mt-4">
           <button
+            type="button"
             onClick={onImportModalCancel}
-            className="px-4 py-2 bg-gray-300 rounded"
+            className="btn-secondary"
           >
             Cancel
           </button>
           <button
+            type="button"
             onClick={() => onImport()}
-            className="px-4 py-2 bg-blue-500 text-white rounded"
+            className="btn-primary"
           >
             Import
           </button>

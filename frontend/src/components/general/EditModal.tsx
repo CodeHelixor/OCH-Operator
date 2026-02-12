@@ -27,42 +27,45 @@ const EditModal: React.FC<EditModalProps> = ({
   if (!show) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-40 flex justify-center items-center">
-      <div className="bg-white rounded-xl shadow-lg w-full max-w-md p-6 animate-fadeIn">
-        <h2 className="text-xl font-bold mb-4 text-gray-800">
+    <div className="modal-overlay" onClick={onClose}>
+      <div
+        className="modal-content w-full max-w-md p-6"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-xl font-bold mb-4 text-slate-800">
           Portation Details
         </h2>
 
         <div className="mb-4">
-          <label className="block mb-1 font-medium text-left">
+          <label className="block mb-1 font-medium text-left text-slate-700">
             Portation Date
           </label>
           <input
             type="date"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 "
+            className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
             value={portationDate}
             onChange={(e) => setPortationDate(e.target.value)}
           />
         </div>
 
         <div className="mb-4">
-          <label className="block mb-1 font-medium text-left">
+          <label className="block mb-1 font-medium text-left text-slate-700">
             Registration Date
           </label>
           <input
             type="date"
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 "
+            className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
             value={registrationDate}
             onChange={(e) => setRegistrationDate(e.target.value)}
           />
         </div>
 
         <div className="mb-6">
-          <label className="block mb-1 font-medium text-left">
+          <label className="block mb-1 font-medium text-left text-slate-700">
             Portation Status
           </label>
           <select
-            className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 "
+            className="w-full border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-shadow"
             value={portationStatus}
             onChange={(e) => setPortationStatus(e.target.value)}
           >
@@ -72,17 +75,11 @@ const EditModal: React.FC<EditModalProps> = ({
           </select>
         </div>
 
-        <div className="flex justify-end space-x-3">
-          <button
-            onClick={onClose}
-            className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-          >
+        <div className="flex justify-end gap-3">
+          <button type="button" onClick={onClose} className="btn-secondary">
             Cancel
           </button>
-          <button
-            onClick={onOk}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-          >
+          <button type="button" onClick={onOk} className="btn-primary">
             Confirm
           </button>
         </div>

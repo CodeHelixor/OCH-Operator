@@ -13,6 +13,7 @@ import number.msisdn.backend.database.repositories.NumberRepository;
 import number.msisdn.backend.database.repositories.TasklistRepository;
 import number.msisdn.backend.general.BatchIdIO;
 import number.msisdn.backend.general.FileUtility;
+import number.msisdn.backend.general.OCHResponseLogger;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import number.msisdn.backend.soap.SoapClient;
@@ -65,9 +66,9 @@ public class CreateRequestHandler {
             //tx.setRequestedExecutionDate(LocalDate.now().plusDays(2).toString());
 
             batch.getTransactions().add(tx);
+            OCHResponseLogger.logSentBatch(batch, "Create (001)");
             boolean result = soapClient.getPort().send(batch);
-            System.out.println("====================here======================");
-            System.out.println("OCH Create send result: " + result);
+            OCHResponseLogger.logOperationResult("SEND (Create 001)", result);
             if(result){
                 batchIdIO.setBatchId(batchIdIO.getBatchId()+1);
 
@@ -104,10 +105,10 @@ public class CreateRequestHandler {
                 return new CreateResponse(false, "Number porting request was not accepted by OCH");
             }
         } catch (UserException_Exception | UnavailableException_Exception e) {
-            // System.out.println("Business error: " + e.getMessage());
+            OCHResponseLogger.logException("SEND (Create 001)", e);
             return new CreateResponse(false, "There is an exception in number porting request");
         } catch (Exception e) {
-            e.printStackTrace();
+            OCHResponseLogger.logException("SEND (Create 001)", e);
             return new CreateResponse(false, "There is an exception in number porting request");
         }     
     }

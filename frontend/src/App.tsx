@@ -24,14 +24,17 @@ function App() {
   //   }, 5000);
   // }, []);
 
+  const bgImage =
+    (process.env.PUBLIC_URL || "") + "/background.jpg";
+
   return (
     <div
-      className="App flex flex-col min-h-screen"
-      style={{ background: "RGB(240,241,245)" }}
+      className="App app-background flex flex-col min-h-screen"
+      style={{ backgroundImage: `url(${bgImage})` }}
     >
       <Header />
       <Router>
-        <div className="flex-grow">
+        <div className="flex-grow flex flex-col min-h-0">
           <Routes>
             <Route path="/" element={<Loginpage />} />
             <Route

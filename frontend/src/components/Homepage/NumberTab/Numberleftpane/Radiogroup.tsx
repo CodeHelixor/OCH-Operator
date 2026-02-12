@@ -12,7 +12,9 @@ type RadioGroupProps = {
 export default function Radiogroup({ value, onChange }: RadioGroupProps) {
   return (
     <div className="py-6 text-left">
-      <p className="items-start font-semibold text-xl mb-3">Filter MSISDN</p>
+      <p className="items-start font-semibold text-xl mb-3 text-slate-800">
+        Filter MSISDN
+      </p>
       <FormControl className="flex">
         <RadioGroup
           aria-labelledby="demo-radio-buttons-group-label"

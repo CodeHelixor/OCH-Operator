@@ -39,13 +39,18 @@ const CancelConfirmModal: React.FC<CancelConfirmModalProps> = ({
         Cancel (Send to OCH)
       </DialogTitle>
       <DialogContent>
-        <p className="text-sm text-gray-600 mb-4">
+        <p className="text-sm text-slate-600 mb-4">
           Send a cancel request to OCH for this number. Telephone number:{" "}
           <strong>{row.telephoneNumber}</strong>. Do you want to apply?
         </p>
       </DialogContent>
       <DialogActions sx={{ px: 3, pb: 2, pt: 1 }}>
-        <Button onClick={onClose} color="inherit" disabled={isSubmitting}>
+        <Button
+          onClick={onClose}
+          variant="outlined"
+          color="secondary"
+          disabled={isSubmitting}
+        >
           Cancel
         </Button>
         <Button
@@ -53,6 +58,7 @@ const CancelConfirmModal: React.FC<CancelConfirmModalProps> = ({
           color="primary"
           variant="contained"
           aria-label="Apply cancel"
+          disabled={isSubmitting}
         >
           {isSubmitting ? "Sending…" : "Apply"}
         </Button>

@@ -13,6 +13,7 @@ import number.msisdn.backend.database.repositories.NumberRepository;
 import number.msisdn.backend.database.repositories.StatusRepository;
 import number.msisdn.backend.database.repositories.TasklistRepository;
 import number.msisdn.backend.general.BatchIdIO;
+import number.msisdn.backend.general.OCHResponseLogger;
 import number.msisdn.backend.general.FileUtility;
 import number.msisdn.backend.soap.SoapClient;
 import number.msisdn.soapclient.Batch;
@@ -46,9 +47,12 @@ public class CompletionRequestHandler {
             tx.setTransactionType("008"); // Typically "001" = Add/Port
             tx.setTelephoneNumber(request.getTelephoneNumber());
             tx.setOchOrderNumber(request.getOchOrderNumber());
+            tx.setUniqueId(request.getUniqueId());
+
             // UniqueId needs to be decremented by 1 when sending to OCH
-            long uniqueIdValue = Long.parseLong(request.getUniqueId()) - 1;
-            tx.setUniqueId(String.valueOf(uniqueIdValue));
+            // long uniqueIdValue = Long.parseLong(request.getUniqueId()) - 1;
+            // tx.setUniqueId(String.valueOf(uniqueIdValue));
+            
             tx.setOriginatingOrderNumber(request.getOriginatingOrderNumber());
             tx.setRecipientNetworkOperator(request.getRecipientNetworkOperator());
             tx.setRecipientServiceOperator(request.getRecipientServiceOperator());
@@ -63,9 +67,9 @@ public class CompletionRequestHandler {
             //tx.setRequestedExecutionDate(LocalDate.now().plusDays(2).toString());
 
             batch.getTransactions().add(tx);
+            OCHResponseLogger.logSentBatch(batch, "Completion (008)");
             boolean result = soapClient.getPort().send(batch);
-            System.out.println("====================here======================");
-            System.out.println("OCH Completion send result: " + result);
+            OCHResponseLogger.logOperationResult("SEND (Completion 008)", result);
             if(result){
                 batchIdIO.setBatchId(batchIdIO.getBatchId()+1);
                 Optional<NumberEntity> optionalNumberEntity = numberRepository.findByOriginatingOrderNumber(request.getOriginatingOrderNumber());
@@ -81,10 +85,10 @@ public class CompletionRequestHandler {
                 return true;
             }
         } catch (UserException_Exception | UnavailableException_Exception e) {
-            // System.out.println("Completion error: " + e.getMessage());
+            OCHResponseLogger.logException("SEND (Completion 008)", e);
             return false;
         } catch (Exception e) {
-            e.printStackTrace();
+            OCHResponseLogger.logException("SEND (Completion 008)", e);
             return false;
         }     
         return false;

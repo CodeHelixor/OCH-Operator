@@ -203,7 +203,7 @@ const Numberleftpane = () => {
   }, [filterType]);
 
   return (
-    <div className="bg-white rounded-lg px-7 py-7 ml-8 my-5">
+    <div className="bg-surface-card rounded-xl px-7 py-7 ml-8 my-5 shadow-sm border border-slate-200/60 card-interactive">
       <div>
         <Searchbar
           searchRange={searchRange}

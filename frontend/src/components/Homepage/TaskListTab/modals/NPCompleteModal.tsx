@@ -214,12 +214,14 @@ const NPCompleteModal: React.FC<ModalProps> = ({
     };
 
   return (
-    <div
-      className="fixed inset-0 flex items-center justify-center bg-black/50"
-      style={{ zIndex: 3 }}
-    >
-      <div className="bg-white p-6 rounded-lg w-[500px] max-w-[90%]">
-        <h2 className="text-xl mb-4">Complete this flow?</h2>
+    <div className="modal-overlay" style={{ zIndex: 1300 }}>
+      <div
+        className="modal-content p-6 w-[500px] max-w-[90%]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <h2 className="text-xl font-bold mb-4 text-slate-800">
+          Complete this flow?
+        </h2>
         <Grid container spacing={2}>
           <Grid size={12}>
             <TextField
@@ -404,14 +406,16 @@ const NPCompleteModal: React.FC<ModalProps> = ({
 
         <div className="flex justify-end gap-3 mt-7">
           <button
+            type="button"
             onClick={onNPCompleteModalCancel}
-            className="px-4 py-2 bg-gray-300 rounded"
+            className="btn-secondary"
           >
             Cancel
           </button>
           <button
+            type="button"
             onClick={() => onConfirm()}
-            className="px-4 py-2 bg-blue-500 text-white rounded"
+            className="btn-primary"
           >
             Confirm
           </button>

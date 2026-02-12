@@ -10,6 +10,7 @@ import number.msisdn.backend.database.entities.TasklistEntity;
 import number.msisdn.backend.database.repositories.ConfirmationStatusRepository;
 import number.msisdn.backend.database.repositories.TasklistRepository;
 import number.msisdn.backend.general.BatchIdIO;
+import number.msisdn.backend.general.OCHResponseLogger;
 import number.msisdn.backend.soap.SoapClient;
 import number.msisdn.soapclient.Batch;
 import number.msisdn.soapclient.Transaction;
@@ -59,9 +60,9 @@ public class ConfirmRequestHandler {
 
 
             batch.getTransactions().add(tx);
+            OCHResponseLogger.logSentBatch(batch, "Confirm (004)");
             boolean result = soapClient.getPort().send(batch);
-            System.out.println("====================here======================");
-            System.out.println("OCH Confirm send result: " + result);
+            OCHResponseLogger.logOperationResult("SEND (Confirm 004)", result);
             if(result){
                 batchIdIO.setBatchId(batchIdIO.getBatchId()+1);
                 if (nextUniqueId != null) {
@@ -79,10 +80,10 @@ public class ConfirmRequestHandler {
                 return true;
             }
         } catch (UserException_Exception | UnavailableException_Exception e) {
-            // System.out.println("Confirmation error: " + e.getMessage());
+            OCHResponseLogger.logException("SEND (Confirm 004)", e);
             return false;
         } catch (Exception e) {
-            e.printStackTrace();
+            OCHResponseLogger.logException("SEND (Confirm 004)", e);
             return false;
         }     
         return false;

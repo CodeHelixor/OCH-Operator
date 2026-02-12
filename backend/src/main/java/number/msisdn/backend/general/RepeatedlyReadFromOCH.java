@@ -24,6 +24,7 @@ import number.msisdn.backend.database.repositories.NumberRepository;
 import number.msisdn.backend.database.repositories.RangeRepository;
 import number.msisdn.backend.database.repositories.StatusRepository;
 import number.msisdn.backend.database.repositories.TasklistRepository;
+import number.msisdn.backend.general.OCHResponseLogger;
 import number.msisdn.backend.soap.SoapClient;
 import number.msisdn.soapclient.Batch;
 import number.msisdn.soapclient.Error;
@@ -66,19 +67,15 @@ public class RepeatedlyReadFromOCH {
             while(existingBatch){
                 try {
                     Batch batch = soapClient.getPort().receive(0);
-                    System.out.println("====================here======================");
-                    System.out.println("OCH receive batch: id=" + batch.getId() + ", transactions=" + batch.getTransactions());
+                    OCHResponseLogger.logReceivedBatch(batch);
                     boolean confirmed = soapClient.getPort().confirm(batch.getId());
-                    System.out.println("====================here======================");
-                    System.out.println("OCH confirm result: " + confirmed);
+                    OCHResponseLogger.logOperationResult("CONFIRM (Batch ID: " + batch.getId() + ")", confirmed);
                     if(confirmed){
-                        System.out.println("========================= 1 batch received ====================");
                         processBatch(batch);
                     }
                 } catch (Exception e) {
-                    // TODO: handle exception
+                    OCHResponseLogger.logException("RECEIVE", e);
                     existingBatch = false;
-                    // System.out.println("========================= There is no batch ====================");
                 }
             }
         }
@@ -386,9 +383,9 @@ public class RepeatedlyReadFromOCH {
                         tx.setOtherOperator(operator);
                         tx.setPriority(2);
                         newBatch.getTransactions().add(tx);
+                        OCHResponseLogger.logSentBatch(newBatch, "NP Update 010");
                         boolean result = soapClient.getPort().send(newBatch);
-                        System.out.println("====================here======================");
-                        System.out.println("OCH send (NP Update 010) result: " + result);
+                        OCHResponseLogger.logOperationResult("SEND (NP Update 010)", result);
                         if(result){
                             batchIdIO.setBatchId(batchIdIO.getBatchId()+1);
                             Optional<NumberEntity> optionalNumberEntity = numberRepository.findByOriginatingOrderNumber(transaction.getOriginatingOrderNumber());
@@ -432,9 +429,9 @@ public class RepeatedlyReadFromOCH {
                         tx.setOtherOperator(operator);
                         tx.setPriority(2);
                         newBatch.getTransactions().add(tx);
+                        OCHResponseLogger.logSentBatch(newBatch, "NP Range Update 010");
                         boolean result = soapClient.getPort().send(newBatch);
-                        System.out.println("====================here======================");
-                        System.out.println("OCH send (NP Range Update 010) result: " + result);
+                        OCHResponseLogger.logOperationResult("SEND (NP Range Update 010)", result);
                         if(result){
                             batchIdIO.setBatchId(batchIdIO.getBatchId()+1);
                         }

@@ -1,17 +1,15 @@
 import React from "react";
+import AppButton from "../../../general/AppButton";
+
 type ButtonComponentProps = {
-  label: String;
+  label: string;
   onClick?: () => void;
 };
+
 const ButtonComponent = ({ label, onClick }: ButtonComponentProps) => {
   return (
-    <div>
-      <button
-        className="bg-buttonColor text-white font-semibold py-2.5 px-6 rounded-lg hover:bg-blue-400 transition my-3 w-full text-lg"
-        onClick={onClick}
-      >
-        {label}
-      </button>
+    <div className="my-3">
+      <AppButton label={label} onClick={onClick} fullWidth />
     </div>
   );
 };

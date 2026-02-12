@@ -1,21 +1,30 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { ThemeProvider } from "@mui/material/styles";
+import CssBaseline from "@mui/material/CssBaseline";
 import "./index.css";
 import App from "./App";
 import reportWebVitals from "./reportWebVitals";
 import { AuthProvider } from "./context/AuthContext";
 import { GlobalProvider } from "./context/GlobalState";
+import { NotificationProvider } from "./context/NotificationContext";
+import theme from "./theme";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
   <React.StrictMode>
-    <AuthProvider>
-      <GlobalProvider>
-        <App />
-      </GlobalProvider>
-    </AuthProvider>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <AuthProvider>
+        <GlobalProvider>
+          <NotificationProvider>
+            <App />
+          </NotificationProvider>
+        </GlobalProvider>
+      </AuthProvider>
+    </ThemeProvider>
   </React.StrictMode>
 );
 

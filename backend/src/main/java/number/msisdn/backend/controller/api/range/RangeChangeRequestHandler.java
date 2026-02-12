@@ -11,6 +11,7 @@ import number.msisdn.backend.database.entities.RangeEntity;
 import number.msisdn.backend.database.repositories.RangeRepository;
 import number.msisdn.backend.general.BatchIdIO;
 import number.msisdn.backend.general.FileUtility;
+import number.msisdn.backend.general.OCHResponseLogger;
 import number.msisdn.backend.soap.SoapClient;
 import number.msisdn.soapclient.Batch;
 import number.msisdn.soapclient.Transaction;
@@ -53,9 +54,9 @@ public class RangeChangeRequestHandler {
             tx.setPriority(2);
             //tx.setRequestedExecutionDate(LocalDate.now().plusDays(2).toString())
             batch.getTransactions().add(tx);
+            OCHResponseLogger.logSentBatch(batch, "Range Change (014)");
             boolean result = soapClient.getPort().send(batch);
-            System.out.println("====================here======================");
-            System.out.println("OCH RangeChange send result: " + result);
+            OCHResponseLogger.logOperationResult("SEND (Range Change 014)", result);
             if(result){
                 // sequenceIO.setSequenceId(sequence+1);      
                 try{
@@ -84,10 +85,10 @@ public class RangeChangeRequestHandler {
             }
             return result;
         } catch (UserException_Exception | UnavailableException_Exception e) {
-            // System.out.println("Business error: " + e.getMessage());
+            OCHResponseLogger.logException("SEND (Range Change 014)", e);
             return false;
         } catch (Exception e) {
-            e.printStackTrace();
+            OCHResponseLogger.logException("SEND (Range Change 014)", e);
             return false;
         }     
     }

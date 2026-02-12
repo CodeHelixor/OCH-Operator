@@ -1,7 +1,6 @@
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import {
-  Button,
   FormControl,
   InputLabel,
   Link,
@@ -526,14 +525,13 @@ const Rangechangebox = () => {
               </Box>
             </Grid>
             <Grid size={12}>
-              <Button
-                variant="contained"
-                color="success"
-                className="h-14"
+              <button
+                type="button"
+                className="btn-primary w-full h-14 text-base"
                 onClick={saveRangeInformation}
               >
                 Save Range Information
-              </Button>
+              </button>
             </Grid>
           </Grid>
         </Box>

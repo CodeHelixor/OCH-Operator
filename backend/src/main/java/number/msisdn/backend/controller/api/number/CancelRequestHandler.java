@@ -11,6 +11,7 @@ import number.msisdn.backend.database.entities.TasklistEntity;
 import number.msisdn.backend.database.repositories.NumberRepository;
 import number.msisdn.backend.database.repositories.TasklistRepository;
 import number.msisdn.backend.general.BatchIdIO;
+import number.msisdn.backend.general.OCHResponseLogger;
 import number.msisdn.backend.soap.SoapClient;
 import number.msisdn.soapclient.Batch;
 import number.msisdn.soapclient.Transaction;
@@ -45,9 +46,9 @@ public class CancelRequestHandler {
             tx.setOriginatingOrderNumber(request.getOriginatingOrderNumber());
             tx.setPriority(5);
             batch.getTransactions().add(tx);
+            OCHResponseLogger.logSentBatch(batch, "Cancel (007)");
             boolean result = soapClient.getPort().send(batch);
-            System.out.println("====================here======================");
-            System.out.println("OCH Cancel send result: " + result);
+            OCHResponseLogger.logOperationResult("SEND (Cancel 007)", result);
             if(result){
                 batchIdIO.setBatchId(batchIdIO.getBatchId()+1);
                 removeRelatedData(request.getOriginatingOrderNumber());
@@ -55,10 +56,10 @@ public class CancelRequestHandler {
             }
             return false;
         }catch (UserException_Exception | UnavailableException_Exception e) {
-            // System.out.println("Business error: " + e.getMessage());
+            OCHResponseLogger.logException("SEND (Cancel 007)", e);
             return false;
         } catch (Exception e) {
-            e.printStackTrace();
+            OCHResponseLogger.logException("SEND (Cancel 007)", e);
             return false;
         }     
     }
