@@ -33,7 +33,7 @@ module.exports = {
         },
         surface: {
           DEFAULT: "#f8fafc",
-          card: "rgba(255, 255, 255, 0.7)",
+          card: "rgba(255, 255, 255, 0.9)",
         },
         danger: {
           DEFAULT: "#dc2626",

@@ -18,9 +18,14 @@ const theme = createTheme({
       main: "#dc2626",
       dark: "#b91c1c",
     },
+    success: {
+      main: "#22c55e",
+      dark: "#16a34a",
+      light: "#4ade80",
+    },
     background: {
       default: "#f8fafc",
-      paper: "rgba(255, 255, 255, 0.7)",
+      paper: "rgba(255, 255, 255, 0.9)",
     },
     text: {
       primary: "#1e293b",
@@ -118,7 +123,7 @@ const theme = createTheme({
     MuiPaper: {
       styleOverrides: {
         root: {
-          backgroundColor: "rgba(255, 255, 255, 0.7)",
+          backgroundColor: "rgba(255, 255, 255, 0.9)",
         },
         rounded: {
           borderRadius: 14,

@@ -29,7 +29,7 @@ export default function Logininputfield({
     >
       <TextField
         label={label}
-        color={!error ? "success" : "error"}
+        color={!error ? "secondary" : "error"}
         focused
         type={type}
         onChange={onChange}

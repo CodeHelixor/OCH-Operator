@@ -72,8 +72,8 @@ const NPCompleteModal: React.FC<ModalProps> = ({
       numberPorted: "",
     };
 
-    // [DISABLED] Set to true to re-enable all validation conditions below.
-    const VALIDATIONS_ENABLED = false;
+    // Set to false to skip validation (e.g. for testing).
+    const VALIDATIONS_ENABLED = true;
     if (!VALIDATIONS_ENABLED) {
       setErrors(newErrors);
       return true;
