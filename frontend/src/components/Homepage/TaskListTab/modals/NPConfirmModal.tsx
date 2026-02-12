@@ -65,8 +65,8 @@ const NPConfirmModal: React.FC<ModalProps> = ({
       confirmationStatus: "",
     };
 
-    // [DISABLED] Set to true to re-enable all validation conditions below.
-    const VALIDATIONS_ENABLED = false;
+    // Set to false to skip validation (e.g. for testing).
+    const VALIDATIONS_ENABLED = true;
     if (!VALIDATIONS_ENABLED) {
       setErrors(newErrors);
       return true;
@@ -80,8 +80,13 @@ const NPConfirmModal: React.FC<ModalProps> = ({
       "YYYYMMDD"
     );
 
+    // Confirmed Execution Date is required
+    if (!formData.confirmedExecutionDate?.trim()) {
+      newErrors.confirmedExecutionDate = "This field is required";
+      isValid = false;
+    }
     //confirmedExecutionDate >= today
-    if (!confirmedDate.isValid()) {
+    else if (!confirmedDate.isValid()) {
       newErrors.confirmedExecutionDate = "Please select a valid date";
       isValid = false;
     } else if (confirmedDate.isBefore(today, "day")) {
@@ -140,7 +145,12 @@ const NPConfirmModal: React.FC<ModalProps> = ({
     };
 
   const modal = (
-    <div className="modal-overlay" style={{ zIndex: 1300 }}>
+    <div
+      className="modal-overlay"
+      style={{ zIndex: 1300 }}
+      onClick={onNPConfirmModalCancel}
+      role="presentation"
+    >
       <div
         className="modal-content p-6 w-[400px] max-w-[90%]"
         onClick={(e) => e.stopPropagation()}

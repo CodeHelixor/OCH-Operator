@@ -215,7 +215,12 @@ const NPCompleteModal: React.FC<ModalProps> = ({
     };
 
   const modal = (
-    <div className="modal-overlay" style={{ zIndex: 1300 }}>
+    <div
+      className="modal-overlay"
+      style={{ zIndex: 1300 }}
+      onClick={onNPCompleteModalCancel}
+      role="presentation"
+    >
       <div
         className="modal-content p-6 w-[500px] max-w-[90%]"
         onClick={(e) => e.stopPropagation()}
@@ -418,7 +423,7 @@ const NPCompleteModal: React.FC<ModalProps> = ({
             onClick={() => onConfirm()}
             className="btn-primary"
           >
-            Confirm
+            Complete
           </button>
         </div>
       </div>

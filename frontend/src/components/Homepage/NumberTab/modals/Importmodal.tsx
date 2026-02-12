@@ -101,7 +101,12 @@ const Importmodal: React.FC<ModalProps> = ({
     };
 
   const modal = (
-    <div className="modal-overlay" style={{ zIndex: 1300 }}>
+    <div
+      className="modal-overlay"
+      style={{ zIndex: 1300 }}
+      onClick={onImportModalCancel}
+      role="presentation"
+    >
       <div
         className="modal-content p-6 w-full max-w-2xl"
         onClick={(e) => e.stopPropagation()}
