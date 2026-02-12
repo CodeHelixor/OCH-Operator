@@ -1,9 +1,9 @@
 import Box from "@mui/material/Box";
+import FormHelperText from "@mui/material/FormHelperText";
 import Grid from "@mui/material/Grid";
 import {
   FormControl,
   InputLabel,
-  Link,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -75,8 +75,7 @@ const Rangechangebox = () => {
     newNumberType: "",
   });
 
-  const handleReset = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
+  const handleReset = () => {
     const emptyValues: InputFields = {
       rangeStart: "",
       rangeEnd: "",
@@ -297,237 +296,221 @@ const Rangechangebox = () => {
   };
 
   return (
-    <div className="mt-10 w-full">
-      <div className="w-full">
-        <Box sx={{ flexGrow: 1 }}>
-          <Grid container spacing={2}>
-            <Grid
-              size={12}
-              sx={{ display: "flex", justifyContent: "flex-start" }}
-            >
-              <Link href="#" underline="always" onClick={handleReset}>
-                Reset
-              </Link>
+    <div className="mt-6 w-full">
+      <div className="bg-surface-card rounded-2xl shadow-sm border border-slate-200/60 overflow-hidden">
+        <div className="px-6 pt-6 pb-1 flex items-center justify-between border-b border-slate-200/60">
+          <h3 className="text-lg font-semibold text-slate-800 tracking-tight">
+            Range Information
+          </h3>
+          <button
+            type="button"
+            onClick={handleReset}
+            className="text-sm font-medium text-slate-500 hover:text-slate-700 focus:outline-none focus:ring-2 focus:ring-slate-300 rounded-lg px-2 py-1 transition-colors"
+          >
+            Reset
+          </button>
+        </div>
+        <Box sx={{ flexGrow: 1 }} className="p-6">
+          <Grid container spacing={3}>
+            <Grid size={12}>
+              <p className="text-sm text-slate-500 mb-1">Range bounds</p>
+              <Grid container spacing={2}>
+                <Grid size={6}>
+                  <TextField
+                    fullWidth
+                    id="rangeStart"
+                    label="Range Start"
+                    variant="outlined"
+                    size="small"
+                    value={values.rangeStart}
+                    onChange={handleTextFieldChange("rangeStart")}
+                    error={Boolean(errors.rangeStart)}
+                    helperText={errors.rangeStart}
+                  />
+                </Grid>
+                <Grid size={6}>
+                  <TextField
+                    fullWidth
+                    id="rangeEnd"
+                    label="Range End"
+                    variant="outlined"
+                    size="small"
+                    value={values.rangeEnd}
+                    onChange={handleTextFieldChange("rangeEnd")}
+                    error={Boolean(errors.rangeEnd)}
+                    helperText={errors.rangeEnd}
+                  />
+                </Grid>
+              </Grid>
             </Grid>
             <Grid size={6}>
-              <TextField
-                fullWidth
-                id="rangeStart"
-                label="Range Start"
-                variant="outlined"
-                value={values.rangeStart}
-                onChange={handleTextFieldChange("rangeStart")}
-                error={Boolean(errors.rangeStart)}
-                helperText={errors.rangeStart}
-              />
+              <FormControl fullWidth size="small" error={Boolean(errors.rangeUpdateType)}>
+                <InputLabel id="range-update-type-label">Range Update Type</InputLabel>
+                <Select
+                  labelId="range-update-type-label"
+                  id="rangeUpdateType"
+                  value={values.rangeUpdateType}
+                  label="Range Update Type"
+                  onChange={handleSelectChange("rangeUpdateType")}
+                >
+                  <MenuItem value={"I"}>Insert</MenuItem>
+                  <MenuItem value={"U"}>Update</MenuItem>
+                  <MenuItem value={"D"}>Delete</MenuItem>
+                </Select>
+                <FormHelperText>{errors.rangeUpdateType}</FormHelperText>
+              </FormControl>
             </Grid>
             <Grid size={6}>
-              <TextField
-                fullWidth
-                id="rangeEnd"
-                label="Range End"
-                variant="outlined"
-                value={values.rangeEnd}
-                onChange={handleTextFieldChange("rangeEnd")}
-                error={Boolean(errors.rangeEnd)}
-                helperText={errors.rangeEnd}
-              />
-            </Grid>
-            <Grid size={6}>
-              <Box sx={{ minWidth: 120, textAlign: "left" }}>
-                <FormControl fullWidth error={Boolean(errors.rangeUpdateType)}>
-                  <InputLabel id="demo-simple-select-label">
-                    Range Update Type
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    value={values.rangeUpdateType}
-                    sx={{ textAlign: "left" }}
-                    label="Range Update Type"
-                    onChange={handleSelectChange("rangeUpdateType")}
-                  >
-                    <MenuItem value={"I"}>Insert</MenuItem>
-                    <MenuItem value={"U"}>Update</MenuItem>
-                    <MenuItem value={"D"}>Delete</MenuItem>
-                  </Select>
-                  {errors.rangeUpdateType && (
-                    <p
-                      style={{
-                        color: "#d32f2f",
-                        fontSize: "0.75rem",
-                        marginTop: "4px",
-                      }}
-                    >
-                      {errors.rangeUpdateType}
-                    </p>
-                  )}
-                </FormControl>
-              </Box>
-            </Grid>
-            <Grid size={6}>
-              <Box sx={{ minWidth: 120, textAlign: "left" }}>
-                <FormControl fullWidth error={Boolean(errors.portingCase)}>
-                  <InputLabel id="demo-simple-select-label">
-                    Porting Case
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    sx={{ textAlign: "left" }}
-                    value={values.portingCase}
-                    label="Porting Case"
-                    onChange={handleSelectChange("portingCase")}
-                  >
-                    <MenuItem value={"NonPorted"}>NonPorted</MenuItem>
-                    <MenuItem value={"PortedWithGeo"}>PortedWithGeo</MenuItem>
-                    <MenuItem value={"PortedNonGeo"}>PortedNonGeo</MenuItem>
-                  </Select>
-                  {errors.portingCase && (
-                    <p
-                      style={{
-                        color: "#d32f2f",
-                        fontSize: "0.75rem",
-                        marginTop: "4px",
-                      }}
-                    >
-                      {errors.portingCase}
-                    </p>
-                  )}
-                </FormControl>
-              </Box>
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                fullWidth
-                id="otherOperator"
-                label="Other Operator"
-                variant="outlined"
-                value={values.otherOperator}
-                onChange={handleTextFieldChange("otherOperator")}
-                error={Boolean(errors.otherOperator)}
-                helperText={errors.otherOperator}
-              />
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                fullWidth
-                id="currentRangeHolder"
-                label="Current Range Holder"
-                variant="outlined"
-                value={values.currentRangeHolder}
-                onChange={handleTextFieldChange("currentRangeHolder")}
-                error={Boolean(errors.currentRangeHolder)}
-                helperText={errors.currentRangeHolder}
-              />
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                fullWidth
-                id="currentNetworkOperator"
-                label="Current NetWork Operator"
-                variant="outlined"
-                value={values.currentNetworkOperator}
-                onChange={handleTextFieldChange("currentNetworkOperator")}
-                error={Boolean(errors.currentNetworkOperator)}
-                helperText={errors.currentNetworkOperator}
-              />
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                fullWidth
-                id="recipientServiceOperator"
-                label="Recipient Service Operator"
-                variant="outlined"
-                value={values.recipientServiceOperator}
-                onChange={handleTextFieldChange("recipientServiceOperator")}
-                error={Boolean(errors.recipientServiceOperator)}
-                helperText={errors.recipientServiceOperator}
-              />
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                fullWidth
-                id="spc"
-                label="SPC"
-                variant="outlined"
-                value={values.spc}
-                onChange={handleTextFieldChange("spc")}
-                error={Boolean(errors.spc)}
-                helperText={errors.spc}
-              />
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                fullWidth
-                id="municipality"
-                label="Municipality"
-                variant="outlined"
-                value={values.municipality}
-                onChange={handleTextFieldChange("municipality")}
-                error={Boolean(errors.municipality)}
-                helperText={errors.municipality}
-              />
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                fullWidth
-                id="routingInfo"
-                label="RoutingInfo"
-                variant="outlined"
-                value={values.routingInfo}
-                onChange={handleTextFieldChange("routingInfo")}
-                error={Boolean(errors.routingInfo)}
-                helperText={errors.routingInfo}
-              />
-            </Grid>
-            <Grid size={6}>
-              <TextField
-                fullWidth
-                id="chargingInfo"
-                label="ChargingInfo"
-                variant="outlined"
-                value={values.chargingInfo}
-                onChange={handleTextFieldChange("chargingInfo")}
-                error={Boolean(errors.chargingInfo)}
-                helperText={errors.chargingInfo}
-              />
-            </Grid>
-            <Grid size={6}>
-              <Box sx={{ minWidth: 120, textAlign: "left" }}>
-                <FormControl fullWidth error={Boolean(errors.newNumberType)}>
-                  <InputLabel id="demo-simple-select-label">
-                    New Number Type
-                  </InputLabel>
-                  <Select
-                    labelId="demo-simple-select-label"
-                    id="demo-simple-select"
-                    sx={{ textAlign: "left" }}
-                    value={values.newNumberType}
-                    label="New Number Type"
-                    onChange={handleSelectChange("newNumberType")}
-                  >
-                    <MenuItem value={"GSM"}>GSM</MenuItem>
-                    <MenuItem value={"FIXED"}>FIXED</MenuItem>
-                  </Select>
-                  {errors.newNumberType && (
-                    <p
-                      style={{
-                        color: "#d32f2f",
-                        fontSize: "0.75rem",
-                        marginTop: "4px",
-                      }}
-                    >
-                      {errors.newNumberType}
-                    </p>
-                  )}
-                </FormControl>
-              </Box>
+              <FormControl fullWidth size="small" error={Boolean(errors.portingCase)}>
+                <InputLabel id="porting-case-label">Porting Case</InputLabel>
+                <Select
+                  labelId="porting-case-label"
+                  id="portingCase"
+                  value={values.portingCase}
+                  label="Porting Case"
+                  onChange={handleSelectChange("portingCase")}
+                >
+                  <MenuItem value={"NonPorted"}>NonPorted</MenuItem>
+                  <MenuItem value={"PortedWithGeo"}>PortedWithGeo</MenuItem>
+                  <MenuItem value={"PortedNonGeo"}>PortedNonGeo</MenuItem>
+                </Select>
+                <FormHelperText>{errors.portingCase}</FormHelperText>
+              </FormControl>
             </Grid>
             <Grid size={12}>
+              <p className="text-sm text-slate-500 mb-1">Operators</p>
+              <Grid container spacing={2}>
+                <Grid size={6}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    id="otherOperator"
+                    label="Other Operator"
+                    variant="outlined"
+                    value={values.otherOperator}
+                    onChange={handleTextFieldChange("otherOperator")}
+                    error={Boolean(errors.otherOperator)}
+                    helperText={errors.otherOperator}
+                  />
+                </Grid>
+                <Grid size={6}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    id="currentRangeHolder"
+                    label="Current Range Holder"
+                    variant="outlined"
+                    value={values.currentRangeHolder}
+                    onChange={handleTextFieldChange("currentRangeHolder")}
+                    error={Boolean(errors.currentRangeHolder)}
+                    helperText={errors.currentRangeHolder}
+                  />
+                </Grid>
+                <Grid size={6}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    id="currentNetworkOperator"
+                    label="Current Network Operator"
+                    variant="outlined"
+                    value={values.currentNetworkOperator}
+                    onChange={handleTextFieldChange("currentNetworkOperator")}
+                    error={Boolean(errors.currentNetworkOperator)}
+                    helperText={errors.currentNetworkOperator}
+                  />
+                </Grid>
+                <Grid size={6}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    id="recipientServiceOperator"
+                    label="Recipient Service Operator"
+                    variant="outlined"
+                    value={values.recipientServiceOperator}
+                    onChange={handleTextFieldChange("recipientServiceOperator")}
+                    error={Boolean(errors.recipientServiceOperator)}
+                    helperText={errors.recipientServiceOperator}
+                  />
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid size={12}>
+              <p className="text-sm text-slate-500 mb-1">Technical fields</p>
+              <Grid container spacing={2}>
+                <Grid size={6}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    id="spc"
+                    label="SPC"
+                    variant="outlined"
+                    value={values.spc}
+                    onChange={handleTextFieldChange("spc")}
+                    error={Boolean(errors.spc)}
+                    helperText={errors.spc}
+                  />
+                </Grid>
+                <Grid size={6}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    id="municipality"
+                    label="Municipality"
+                    variant="outlined"
+                    value={values.municipality}
+                    onChange={handleTextFieldChange("municipality")}
+                    error={Boolean(errors.municipality)}
+                    helperText={errors.municipality}
+                  />
+                </Grid>
+                <Grid size={6}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    id="routingInfo"
+                    label="Routing Info"
+                    variant="outlined"
+                    value={values.routingInfo}
+                    onChange={handleTextFieldChange("routingInfo")}
+                    error={Boolean(errors.routingInfo)}
+                    helperText={errors.routingInfo}
+                  />
+                </Grid>
+                <Grid size={6}>
+                  <TextField
+                    fullWidth
+                    size="small"
+                    id="chargingInfo"
+                    label="Charging Info"
+                    variant="outlined"
+                    value={values.chargingInfo}
+                    onChange={handleTextFieldChange("chargingInfo")}
+                    error={Boolean(errors.chargingInfo)}
+                    helperText={errors.chargingInfo}
+                  />
+                </Grid>
+                <Grid size={6}>
+                  <FormControl fullWidth size="small" error={Boolean(errors.newNumberType)}>
+                    <InputLabel id="new-number-type-label">New Number Type</InputLabel>
+                    <Select
+                      labelId="new-number-type-label"
+                      id="newNumberType"
+                      value={values.newNumberType}
+                      label="New Number Type"
+                      onChange={handleSelectChange("newNumberType")}
+                    >
+                      <MenuItem value={"GSM"}>GSM</MenuItem>
+                      <MenuItem value={"FIXED"}>FIXED</MenuItem>
+                    </Select>
+                    <FormHelperText>{errors.newNumberType}</FormHelperText>
+                  </FormControl>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid size={12} className="pt-2">
               <button
                 type="button"
-                className="btn-primary w-full h-14 text-base"
+                className="btn-primary w-full h-12 rounded-xl text-base font-semibold"
                 onClick={saveRangeInformation}
               >
                 Save Range Information
