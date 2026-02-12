@@ -58,8 +58,7 @@ const theme = createTheme({
             justifyContent: "center",
           },
           "& .MuiBackdrop-root": {
-            backgroundColor: "rgba(15, 23, 42, 0.52)",
-            backdropFilter: "blur(8px)",
+            backgroundColor: "rgba(15, 23, 42, 0.45)",
             transition: `opacity 280ms ${smoothOutEasing}`,
           },
           "& .MuiDialog-paper": {
@@ -67,7 +66,7 @@ const theme = createTheme({
           },
         },
         paper: {
-          backgroundColor: "rgba(255, 255, 255, 0.7)",
+          backgroundColor: "#ffffff",
           borderRadius: 18,
           boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
           maxHeight: "90vh",

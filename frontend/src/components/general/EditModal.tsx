@@ -1,5 +1,6 @@
 // EditModal.tsx
 import React from "react";
+import { createPortal } from "react-dom";
 
 type EditModalProps = {
   show: boolean;
@@ -26,7 +27,7 @@ const EditModal: React.FC<EditModalProps> = ({
 }) => {
   if (!show) return null;
 
-  return (
+  const modal = (
     <div className="modal-overlay" onClick={onClose}>
       <div
         className="modal-content w-full max-w-md p-6"
@@ -86,6 +87,7 @@ const EditModal: React.FC<EditModalProps> = ({
       </div>
     </div>
   );
+  return createPortal(modal, document.body);
 };
 
 export default EditModal;

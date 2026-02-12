@@ -1,4 +1,5 @@
 import React, { ChangeEvent, useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import {
   Box,
   FormControl,
@@ -213,7 +214,7 @@ const NPCompleteModal: React.FC<ModalProps> = ({
       }));
     };
 
-  return (
+  const modal = (
     <div className="modal-overlay" style={{ zIndex: 1300 }}>
       <div
         className="modal-content p-6 w-[500px] max-w-[90%]"
@@ -423,6 +424,7 @@ const NPCompleteModal: React.FC<ModalProps> = ({
       </div>
     </div>
   );
+  return createPortal(modal, document.body);
 };
 
 export default NPCompleteModal;
