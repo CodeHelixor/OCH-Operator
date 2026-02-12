@@ -31,6 +31,7 @@ export default function Searchbar({
           display: "flex",
           alignItems: "center",
           borderRadius: 2,
+          backgroundColor: "rgba(255, 255, 255, 0.7)",
           boxShadow: "0 1px 2px 0 rgb(0 0 0 / 0.05)",
           border: "1px solid rgba(148, 163, 184, 0.3)",
         }}

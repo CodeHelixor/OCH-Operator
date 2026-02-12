@@ -50,7 +50,7 @@ code {
 }
 
 .modal-content {
-  @apply bg-white rounded-2xl shadow-modal max-h-[90vh] overflow-y-auto;
+  @apply bg-white/70 rounded-2xl shadow-modal max-h-[90vh] overflow-y-auto;
   animation: modal-content-in 0.32s cubic-bezier(0.32, 0.72, 0, 1) forwards;
   will-change: transform, opacity;
 }

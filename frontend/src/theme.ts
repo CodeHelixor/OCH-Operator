@@ -20,7 +20,7 @@ const theme = createTheme({
     },
     background: {
       default: "#f8fafc",
-      paper: "#ffffff",
+      paper: "rgba(255, 255, 255, 0.7)",
     },
     text: {
       primary: "#1e293b",
@@ -67,6 +67,7 @@ const theme = createTheme({
           },
         },
         paper: {
+          backgroundColor: "rgba(255, 255, 255, 0.7)",
           borderRadius: 18,
           boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
           maxHeight: "90vh",
@@ -117,6 +118,9 @@ const theme = createTheme({
     },
     MuiPaper: {
       styleOverrides: {
+        root: {
+          backgroundColor: "rgba(255, 255, 255, 0.7)",
+        },
         rounded: {
           borderRadius: 14,
           transition: `box-shadow 280ms ${smoothEasing}`,
