@@ -1,31 +1,19 @@
-import React, { useEffect } from "react";
-import logo from "./logo.svg";
+import React from "react";
 import "./App.css";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Homepage from "./pages/Homepage";
 import Loginpage from "./pages/LoginPage";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { TabProvider } from "./context/TabContext";
 
-function App() {
-  // const API_BASE_URL =
-  //   window._env_?.REACT_APP_API_BASE_URL || "http://localhost:8080";
-
-  // const receivefromOCH = () => {
-  //   const userConfirmed = window.confirm("Will you confirm this request?");
-  //   if (userConfirmed) {
-  //     console.log("request from OCH");
-  //   }
-  // };
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     receivefromOCH();
-  //   }, 5000);
-  // }, []);
-
+function AppContent() {
+  const location = useLocation();
+  const isLoginPage = location.pathname === "/";
   const bgImage =
-    (process.env.PUBLIC_URL || "") + "/background.jpg";
+    (process.env.PUBLIC_URL || "") +
+    (isLoginPage ? "/loginbackground.jpg" : "/" + encodeURIComponent("system background.jpg"));
 
   return (
     <div
@@ -33,23 +21,31 @@ function App() {
       style={{ backgroundImage: `url(${bgImage})` }}
     >
       <Header />
-      <Router>
-        <div className="flex-grow flex flex-col min-h-0">
-          <Routes>
-            <Route path="/" element={<Loginpage />} />
-            <Route
-              path="/home"
-              element={
-                <ProtectedRoute>
-                  <Homepage />
-                </ProtectedRoute>
-              }
-            />
-          </Routes>
-        </div>
-      </Router>
+      <div className="flex-grow flex flex-col min-h-0">
+        <Routes>
+          <Route path="/" element={<Loginpage />} />
+          <Route
+            path="/home"
+            element={
+              <ProtectedRoute>
+                <Homepage />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </div>
       <Footer />
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <TabProvider>
+        <AppContent />
+      </TabProvider>
+    </Router>
   );
 }
 

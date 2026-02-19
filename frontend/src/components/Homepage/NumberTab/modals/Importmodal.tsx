@@ -108,94 +108,103 @@ const Importmodal: React.FC<ModalProps> = ({
       role="presentation"
     >
       <div
-        className="modal-content p-6 w-full max-w-2xl"
+        className="modal-content p-8 w-full max-w-4xl min-h-[420px] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-xl font-bold mb-4 text-slate-800">Import Number</h2>
-        <Grid container spacing={2}>
-          <Grid size={6}>
-            <TextField
-              fullWidth
-              id="telephoneNumber"
-              label="* Telephone Number"
-              variant="outlined"
-              value={formData.telephoneNumber}
-              onChange={handleTextFieldChange("telephoneNumber")}
-              error={Boolean(errors.telephoneNumber)}
-              helperText={errors.telephoneNumber}
-            />
-          </Grid>
-          <Grid size={6}>
-            <TextField
-              fullWidth
-              id="recipientServiceOperator"
-              label="* Recipient Service Operator"
-              variant="outlined"
-              value={formData.recipientServiceOperator}
-              onChange={handleTextFieldChange("recipientServiceOperator")}
-              error={Boolean(errors.recipientServiceOperator)}
-              helperText={errors.recipientServiceOperator}
-            />
-          </Grid>
-
-          <Grid size={6}>
-            <TextField
-              fullWidth
-              id="recipientNetworkOperator"
-              label="* Recipient Network Operator"
-              variant="outlined"
-              value={formData.recipientNetworkOperator}
-              onChange={handleTextFieldChange("recipientNetworkOperator")}
-              error={Boolean(errors.recipientNetworkOperator)}
-              helperText={errors.recipientNetworkOperator}
-            />
-          </Grid>
-
-          <Grid size={6}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DatePicker
-                label="Requested Execution Date"
-                value={
-                  formData.requestedExecutionDate
-                    ? dayjs(formData.requestedExecutionDate)
-                    : null
-                }
-                onChange={(newValue: Dayjs | null) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    requestedExecutionDate: newValue
-                      ? newValue.format("YYYYMMDD")
-                      : "",
-                  }));
-                }}
-                slotProps={{
-                  textField: {
-                    fullWidth: true,
-                    error: Boolean(errors.requestedExecutionDate),
-                    helperText: errors.requestedExecutionDate,
-                  },
-                }}
+        <h2 className="text-xl font-bold mb-12 text-slate-800">Import Number</h2>
+        <Box
+          sx={{
+            "& .MuiInputBase-root": { minHeight: 56 },
+            "& .MuiOutlinedInput-root": { minHeight: 56 },
+          }}
+        >
+          <Grid container spacing={2}>
+            <Grid size={6}>
+              <TextField
+                fullWidth
+                id="telephoneNumber"
+                label="* Telephone Number"
+                variant="outlined"
+                value={formData.telephoneNumber}
+                onChange={handleTextFieldChange("telephoneNumber")}
+                error={Boolean(errors.telephoneNumber)}
+                helperText={errors.telephoneNumber}
+                slotProps={{ input: { sx: { minHeight: 56 } } }}
               />
-            </LocalizationProvider>
-          </Grid>
+            </Grid>
+            <Grid size={6}>
+              <TextField
+                fullWidth
+                id="recipientServiceOperator"
+                label="* Recipient Service Operator"
+                variant="outlined"
+                value={formData.recipientServiceOperator}
+                onChange={handleTextFieldChange("recipientServiceOperator")}
+                error={Boolean(errors.recipientServiceOperator)}
+                helperText={errors.recipientServiceOperator}
+                slotProps={{ input: { sx: { minHeight: 56 } } }}
+              />
+            </Grid>
 
-          <Grid size={6}>
-            <Box sx={{ minWidth: 120, textAlign: "left" }}>
-              <FormControl fullWidth error={Boolean(errors.pointOfConnection)}>
-                <InputLabel id="demo-simple-select-label">
-                  * PointOfConnection
-                </InputLabel>
-                <Select
-                  labelId="demo-simple-select-label"
-                  id="demo-simple-select"
-                  sx={{ textAlign: "left" }}
-                  value={formData.pointOfConnection}
-                  label="PointOfConnection"
-                  onChange={handleSelectChange("pointOfConnection")}
-                >
-                  <MenuItem value={"RECIPIENT"}>Recipient</MenuItem>
-                  <MenuItem value={"DONOR"}>Donor</MenuItem>
-                </Select>
+            <Grid size={6}>
+              <TextField
+                fullWidth
+                id="recipientNetworkOperator"
+                label="* Recipient Network Operator"
+                variant="outlined"
+                value={formData.recipientNetworkOperator}
+                onChange={handleTextFieldChange("recipientNetworkOperator")}
+                error={Boolean(errors.recipientNetworkOperator)}
+                helperText={errors.recipientNetworkOperator}
+                slotProps={{ input: { sx: { minHeight: 56 } } }}
+              />
+            </Grid>
+
+            <Grid size={6}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DatePicker
+                  label="Requested Execution Date"
+                  value={
+                    formData.requestedExecutionDate
+                      ? dayjs(formData.requestedExecutionDate)
+                      : null
+                  }
+                  onChange={(newValue: Dayjs | null) => {
+                    setFormData((prev) => ({
+                      ...prev,
+                      requestedExecutionDate: newValue
+                        ? newValue.format("YYYYMMDD")
+                        : "",
+                    }));
+                  }}
+                  slotProps={{
+                    textField: {
+                      fullWidth: true,
+                      error: Boolean(errors.requestedExecutionDate),
+                      helperText: errors.requestedExecutionDate,
+                    },
+                  }}
+                />
+              </LocalizationProvider>
+            </Grid>
+
+            <Grid size={6}>
+              <Box sx={{ minWidth: 120, textAlign: "left" }}>
+                <FormControl fullWidth error={Boolean(errors.pointOfConnection)} sx={{ "& .MuiInputBase-root": { minHeight: 56 } }}>
+                  <InputLabel id="demo-simple-select-label">
+                    * PointOfConnection
+                  </InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    sx={{ textAlign: "left", minHeight: 56 }}
+                    value={formData.pointOfConnection}
+                    label="PointOfConnection"
+                    onChange={handleSelectChange("pointOfConnection")}
+                  >
+                    <MenuItem value={"RECIPIENT"}>Recipient</MenuItem>
+                    <MenuItem value={"DONOR"}>Donor</MenuItem>
+                  </Select>
                 {errors.pointOfConnection && (
                   <p
                     style={{
@@ -211,8 +220,9 @@ const Importmodal: React.FC<ModalProps> = ({
             </Box>
           </Grid>
         </Grid>
+        </Box>
 
-        <div className="flex justify-end gap-3 mt-4">
+        <div className="flex justify-end gap-3 mt-auto pt-6">
           <button
             type="button"
             onClick={onImportModalCancel}

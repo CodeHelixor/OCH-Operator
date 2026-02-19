@@ -222,12 +222,18 @@ const NPCompleteModal: React.FC<ModalProps> = ({
       role="presentation"
     >
       <div
-        className="modal-content p-6 w-[500px] max-w-[90%]"
+        className="modal-content p-8 w-full max-w-4xl min-h-[480px]"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-xl font-bold mb-4 text-slate-800">
           Complete this flow?
         </h2>
+        <Box
+          sx={{
+            "& .MuiInputBase-root": { minHeight: 56 },
+            "& .MuiOutlinedInput-root": { minHeight: 56 },
+          }}
+        >
         <Grid container spacing={2}>
           <Grid size={12}>
             <TextField
@@ -237,6 +243,7 @@ const NPCompleteModal: React.FC<ModalProps> = ({
               variant="outlined"
               value={selectedTask.telephoneNumber}
               disabled
+              slotProps={{ input: { sx: { minHeight: 56 } } }}
             />
           </Grid>
 
@@ -250,6 +257,7 @@ const NPCompleteModal: React.FC<ModalProps> = ({
               onChange={handleTextFieldChange("recipientServiceOperator")}
               error={Boolean(errors.recipientServiceOperator)}
               helperText={errors.recipientServiceOperator}
+              slotProps={{ input: { sx: { minHeight: 56 } } }}
             />
           </Grid>
           <Grid size={6}>
@@ -262,19 +270,20 @@ const NPCompleteModal: React.FC<ModalProps> = ({
               onChange={handleTextFieldChange("recipientNetworkOperator")}
               error={Boolean(errors.recipientNetworkOperator)}
               helperText={errors.recipientNetworkOperator}
+              slotProps={{ input: { sx: { minHeight: 56 } } }}
             />
           </Grid>
 
           <Grid size={6}>
             <Box sx={{ minWidth: 120, textAlign: "left" }}>
-              <FormControl fullWidth error={Boolean(errors.portingCase)}>
+              <FormControl fullWidth error={Boolean(errors.portingCase)} sx={{ "& .MuiInputBase-root": { minHeight: 56 } }}>
                 <InputLabel id="demo-simple-select-label">
                   Porting Case
                 </InputLabel>
                 <Select
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
-                  sx={{ textAlign: "left" }}
+                  sx={{ textAlign: "left", minHeight: 56 }}
                   value={formData.portingCase}
                   label="Porting Case"
                   onChange={handleSelectChange("portingCase")}
@@ -299,14 +308,14 @@ const NPCompleteModal: React.FC<ModalProps> = ({
           </Grid>
           <Grid size={6}>
             <Box sx={{ minWidth: 40, textAlign: "left" }}>
-              <FormControl fullWidth error={Boolean(errors.newNumberType)}>
+              <FormControl fullWidth error={Boolean(errors.newNumberType)} sx={{ "& .MuiInputBase-root": { minHeight: 56 } }}>
                 <InputLabel id="demo-simple-select-label">
                   New Number Type
                 </InputLabel>
                 <Select
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
-                  sx={{ textAlign: "left" }}
+                  sx={{ textAlign: "left", minHeight: 56 }}
                   value={formData.newNumberType}
                   label="New Number Type"
                   onChange={handleSelectChange("newNumberType")}
@@ -339,6 +348,7 @@ const NPCompleteModal: React.FC<ModalProps> = ({
               onChange={handleTextFieldChange("spc")}
               error={Boolean(errors.spc)}
               helperText={errors.spc}
+              slotProps={{ input: { sx: { minHeight: 56 } } }}
             />
           </Grid>
           <Grid size={6}>
@@ -351,6 +361,7 @@ const NPCompleteModal: React.FC<ModalProps> = ({
               onChange={handleTextFieldChange("municipality")}
               error={Boolean(errors.municipality)}
               helperText={errors.municipality}
+              slotProps={{ input: { sx: { minHeight: 56 } } }}
             />
           </Grid>
           <Grid size={6}>
@@ -363,6 +374,7 @@ const NPCompleteModal: React.FC<ModalProps> = ({
               onChange={handleTextFieldChange("routingInfo")}
               error={Boolean(errors.routingInfo)}
               helperText={errors.routingInfo}
+              slotProps={{ input: { sx: { minHeight: 56 } } }}
             />
           </Grid>
           <Grid size={6}>
@@ -375,18 +387,19 @@ const NPCompleteModal: React.FC<ModalProps> = ({
               onChange={handleTextFieldChange("chargingInfo")}
               error={Boolean(errors.chargingInfo)}
               helperText={errors.chargingInfo}
+              slotProps={{ input: { sx: { minHeight: 56 } } }}
             />
           </Grid>
           <Grid size={6}>
             <Box sx={{ minWidth: 40, textAlign: "left" }}>
-              <FormControl fullWidth error={Boolean(errors.numberPorted)}>
+              <FormControl fullWidth error={Boolean(errors.numberPorted)} sx={{ "& .MuiInputBase-root": { minHeight: 56 } }}>
                 <InputLabel id="demo-simple-select-label">
                   NumberPorted
                 </InputLabel>
                 <Select
                   labelId="demo-simple-select-label"
                   id="demo-simple-select"
-                  sx={{ textAlign: "left" }}
+                  sx={{ textAlign: "left", minHeight: 56 }}
                   value={formData.numberPorted}
                   label="Number Ported"
                   onChange={handleSelectChange("numberPorted")}
@@ -409,6 +422,7 @@ const NPCompleteModal: React.FC<ModalProps> = ({
             </Box>
           </Grid>
         </Grid>
+        </Box>
 
         <div className="flex justify-end gap-3 mt-7">
           <button

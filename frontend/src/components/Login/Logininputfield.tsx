@@ -25,7 +25,7 @@ export default function Logininputfield({
       sx={{ "& > :not(style)": { m: 1, width: "90%" } }}
       noValidate
       autoComplete="off"
-      className="py-1.5"
+      className="py-3"
     >
       <TextField
         label={label}
@@ -36,6 +36,11 @@ export default function Logininputfield({
         onKeyDown={onKeyDown}
         value={value}
         helperText={error}
+        slotProps={{
+          input: {
+            sx: { py: 1.25, fontSize: "1rem" },
+          },
+        }}
       />
     </Box>
   );

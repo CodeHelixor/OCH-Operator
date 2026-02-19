@@ -57,7 +57,7 @@ code {
 @layer components {
   .btn-base {
     @apply inline-flex items-center justify-center font-semibold rounded-xl
-           focus:outline-none focus:ring-2 focus:ring-offset-2
+           focus:outline-none focus:ring-2
            disabled:opacity-60 disabled:pointer-events-none
            select-none;
     transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1),

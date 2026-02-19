@@ -66,8 +66,9 @@ const LoginPage = () => {
       handleLogin(); // call your login function
     }
   };
+
   return (
-    <div className="flex items-center justify-start pl-32 mt-40 animate-fade-in">
+    <div className="flex flex-col items-start pl-32 mt-40 animate-fade-in">
       <div className="px-6 py-10 bg-surface-card w-[70%] rounded-2xl shadow-modal border border-slate-200/60 md:w-[60%] lg:w-[50%] xl:w-[35%] animate-modal-content-in">
         <Logininputfield
           label="Username"
@@ -88,8 +89,8 @@ const LoginPage = () => {
           }
           onKeyDown={handleEnterPressed}
         />
-        <div className="px-8 pt-4">
-          <ButtonComponent label={"Log in"} onClick={handleLogin} />
+        <div className="px-8 pt-4 flex justify-end">
+          <ButtonComponent label={"Log in"} onClick={handleLogin} fullWidth={false} />
         </div>
       </div>
     </div>

@@ -39,85 +39,85 @@ const columns: readonly Column[] = [
   {
     id: "id",
     label: "No",
-    minWidth: 25,
+    minWidth: 35,
     align: "center",
   },
   {
     id: "range",
     label: "Range",
-    minWidth: 250,
+    minWidth: 120,
     align: "center",
   },
   {
     id: "startDate",
     label: "Start Date",
-    minWidth: 250,
+    minWidth: 120,
     align: "center",
   },
   {
     id: "rangeHolderId",
     label: "Range Holder Id",
-    minWidth: 80,
+    minWidth: 55,
     align: "center",
   },
   {
     id: "serviceOperator",
     label: "Service Operator",
-    minWidth: 80,
+    minWidth: 55,
     align: "center",
   },
   {
     id: "networkOperator",
     label: "Network Operator",
-    minWidth: 80,
+    minWidth: 55,
     align: "center",
   },
   {
     id: "lubo",
     label: "LUBO",
-    minWidth: 80,
+    minWidth: 50,
     align: "center",
   },
   {
     id: "numberType",
     label: "Number Type",
-    minWidth: 80,
+    minWidth: 55,
     align: "center",
   },
   {
     id: "spc",
     label: "SPC",
-    minWidth: 80,
+    minWidth: 40,
     align: "center",
   },
   {
     id: "municipality",
     label: "Municipality",
-    minWidth: 80,
+    minWidth: 60,
     align: "center",
   },
   {
     id: "chargingInfo",
     label: "Charging Info",
-    minWidth: 80,
+    minWidth: 55,
     align: "center",
   },
   {
     id: "routingInfo",
     label: "Routing Info",
-    minWidth: 80,
+    minWidth: 55,
     align: "center",
   },
   {
     id: "portingCase",
     label: "Porting Case",
-    minWidth: 80,
+    minWidth: 65,
     align: "center",
   },
   {
     id: "ochOrderNumber",
     label: "OCH Order Number",
-    minWidth: 80,
+    minWidth: 70,
     align: "center",
   },
 ];
@@ -154,7 +154,7 @@ const Rangetable = ({ ranges, onSearch }: RangeTableProps) => {
 
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
-      <Box sx={{ p: 2, borderBottom: 1, borderColor: "divider" }}>
+      <Box sx={{ py: 1.5, px: 2, borderBottom: 1, borderColor: "divider" }}>
         <Stack
           direction="row"
           spacing={2}
@@ -184,7 +184,7 @@ const Rangetable = ({ ranges, onSearch }: RangeTableProps) => {
           </Button>
         </Stack>
       </Box>
-      <TableContainer sx={{ maxHeight: 440 }}>
+      <TableContainer sx={{ px: 2, pb: 2 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
@@ -193,8 +193,9 @@ const Rangetable = ({ ranges, onSearch }: RangeTableProps) => {
                   key={column.id}
                   align={column.align}
                   style={{ minWidth: column.minWidth }}
+                  sx={{ py: 0.75, whiteSpace: "nowrap" }}
                 >
-                  <span className="font-bold text-lg">{column.label}</span>
+                  <span className="font-bold text-sm">{column.label}</span>
                 </TableCell>
               ))}
             </TableRow>
@@ -219,14 +220,14 @@ const Rangetable = ({ ranges, onSearch }: RangeTableProps) => {
                       {columns.map((column) => {
                         if (column.id === "id") {
                           return (
-                            <TableCell key={column.id} align={column.align}>
+                            <TableCell key={column.id} align={column.align} sx={{ py: 0.75 }}>
                               {index + 1}
                             </TableCell>
                           );
                         }
                         if (column.id == "range") {
                           return (
-                            <TableCell key={column.id} align={column.align}>
+                            <TableCell key={column.id} align={column.align} sx={{ py: 0.75 }}>
                               {`${row.rangeStart} - ${row.rangeEnd}`}
                             </TableCell>
                           );
@@ -247,7 +248,7 @@ const Rangetable = ({ ranges, onSearch }: RangeTableProps) => {
                         else {
                           const value = (row as any)[column.id];
                           return (
-                            <TableCell key={column.id} align={column.align}>
+                            <TableCell key={column.id} align={column.align} sx={{ py: 0.75 }}>
                               {value}
                             </TableCell>
                           );

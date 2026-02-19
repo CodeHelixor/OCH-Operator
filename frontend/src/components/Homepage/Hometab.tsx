@@ -1,28 +1,18 @@
 import * as React from "react";
-import Tabs from "@mui/material/Tabs";
-import Tab from "@mui/material/Tab";
 import Numbertab from "./NumberTab/Numbertab";
-import {
-  Assignment,
-  Home,
-  NotificationsNone,
-  SendToMobile,
-  Storage,
-} from "@mui/icons-material";
 import Tasklisttab from "./TaskListTab/Tasklisttab";
-import { Badge, Tooltip } from "@mui/material";
-import Notificationtab from "./ErrorTab/Errortab";
 import AlertComponent from "../general/AlertComponent";
 import Rangetab from "./RangeTab/Rangetab";
 import { RangeData } from "./RangeTab/types";
 import { NumberData } from "./NumberTab/types";
 import { TaskData } from "./TaskListTab/types";
 import { useAuth } from "../../context/AuthContext";
+import { useTab } from "../../context/TabContext";
 import Errortab from "./ErrorTab/Errortab";
 import { ErrorData } from "./ErrorTab/types";
 
 export default function Hometab() {
-  const [value, setValue] = React.useState(0);
+  const { tabIndex: value, setTabIndex: setValue, setNotificationCount } = useTab();
   const [badgeContent, setBadgeContent] = React.useState(0);
   const [numbers, setNumbers] = React.useState<NumberData[]>([]);
   const [ranges, setRanges] = React.useState<RangeData[]>([]);
@@ -129,10 +119,9 @@ export default function Hometab() {
       let data = await res.json();
       console.log("====================here======================");
       console.log(data);
-      setBadgeContent(
-        data.filter((note: any) => !note.isViewed && note.userId == userId)
-          .length
-      );
+      const count = data.filter((note: any) => !note.isViewed && note.userId == userId).length;
+      setBadgeContent(count);
+      setNotificationCount(count);
       setErrors(data.filter((note: any) => note.userId == userId));
     } catch (err) {
       // console.log("Error reading from TaskLists: ", err);
@@ -223,11 +212,6 @@ export default function Hometab() {
     setFilteredRanges(filtered);
   };
 
-  ////////////////////   For Changing the Tab   ///////////////////////
-  const handleChange = (event: React.SyntheticEvent, newValue: number) => {
-    setValue(newValue);
-  };
-
   const renderTabContent = () => {
     return (
       <div>
@@ -259,46 +243,6 @@ export default function Hometab() {
 
   return (
     <div>
-      <Tabs
-        value={value}
-        onChange={handleChange}
-        aria-label="icon tabs example"
-      >
-        <Tab
-          icon={
-            <Tooltip title="Database">
-              <Storage />
-            </Tooltip>
-          }
-          aria-label="phone"
-        />
-        <Tab
-          icon={
-            <Tooltip title="Range">
-              <SendToMobile />
-            </Tooltip>
-          }
-          aria-label="favorite"
-        />
-        <Tab
-          icon={
-            <Tooltip title="Tasklist">
-              <Assignment />
-            </Tooltip>
-          }
-          aria-label="favorite"
-        />
-        <Tab
-          icon={
-            <Tooltip title="Notification">
-              <Badge color="error" badgeContent={badgeContent}>
-                <NotificationsNone />
-              </Badge>
-            </Tooltip>
-          }
-          aria-label="person"
-        />
-      </Tabs>
       <div>{renderTabContent()}</div>
       <AlertComponent
         show={showAlert}

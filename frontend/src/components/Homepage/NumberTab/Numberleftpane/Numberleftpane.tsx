@@ -203,24 +203,17 @@ const Numberleftpane = () => {
   }, [filterType]);
 
   return (
-    <div className="bg-surface-card rounded-xl px-7 py-7 ml-8 my-5 shadow-sm border border-slate-200/60 card-interactive">
-      <div>
+    <div className="bg-surface-card rounded-xl px-7 py-7 ml-8 my-5 shadow-sm border border-slate-200/60 card-interactive flex flex-col" style={{ height: 687 }}>
+      <div className="mt-12">
         <Searchbar
           searchRange={searchRange}
           onChange={handleSearchbarChange}
           onClick={onSearch}
           onKeyDown={searchbarEnterPressed}
         />
-        <Radiogroup value={filterType} onChange={onFilterTypeChange} />
-        <ButtonComponent
-          label="Import Number"
-          onClick={() => setIsImportModalOpen(true)}
-        />
-        {/* <ButtonComponent label="Upload List" onClick={onUploadListClicked} />
-        <ButtonComponent
-          label="Download List"
-          onClick={onDownloadListClicked}
-        /> */}
+        <div className="mt-6">
+          <Radiogroup value={filterType} onChange={onFilterTypeChange} />
+        </div>
         <AlertComponent
           show={showAlert}
           message={alertMsg}
@@ -232,6 +225,12 @@ const Numberleftpane = () => {
           ref={fileInputRef}
           style={{ display: "none" }}
           onChange={onUploadFileChange}
+        />
+      </div>
+      <div className="mt-auto flex justify-end pt-4">
+        <ButtonComponent
+          label="Import Number"
+          onClick={() => setIsImportModalOpen(true)}
         />
       </div>
       {isImportModalOpen && (

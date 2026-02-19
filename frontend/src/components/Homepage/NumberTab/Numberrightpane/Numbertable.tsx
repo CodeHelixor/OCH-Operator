@@ -299,7 +299,7 @@ export default function Numbertable({ numbers }: NumberTableProps) {
       sx={{ width: "100%", overflow: "hidden" }}
       className="rounded-lg px-7 py-7 my-5"
     >
-      <TableContainer sx={{ maxHeight: 440 }}>
+      <TableContainer sx={{ height: 580 }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
