@@ -38,17 +38,19 @@ public class ConfirmRequestHandler {
             Batch batch = new Batch();
             batch.setId(batchIdIO.getBatchId()); // Or use unique ID generation
             //Create one transaction
-            // OCH expects uniqueId decremented by 1 for confirm (e.g. 2505534 -> 2505533)
+            // OCH: 002 -> uniqueId + 1; 001 -> uniqueId + 0
             String currentUniqueId = task.getUniqueId();
-            String sendUniqueId = currentUniqueId != null && !currentUniqueId.isEmpty()
-                    ? String.valueOf(Long.parseLong(currentUniqueId) - 1)
+            String transactionType = task.getTransactionType() != null ? task.getTransactionType().trim() : "";
+            int uniqueIdIncrement = "002".equals(transactionType) ? 1 : 0;
+            String nextUniqueId = currentUniqueId != null && !currentUniqueId.isEmpty()
+                    ? String.valueOf(Long.parseLong(currentUniqueId) + uniqueIdIncrement)
                     : currentUniqueId;
 
             Transaction tx = new Transaction();
             tx.setTransactionType("004"); 
             tx.setTelephoneNumber(task.getTelephoneNumber());
             tx.setOchOrderNumber(task.getOchOrderNumber());
-            tx.setUniqueId(sendUniqueId);
+            tx.setUniqueId(nextUniqueId);
             tx.setOriginatingOrderNumber(task.getOriginatingOrderNumber());
             tx.setConfirmedExecutionDate(request.getConfirmedExecutionDate());
             // System.out.println(request.getConfirmationStatus());
@@ -65,7 +67,9 @@ public class ConfirmRequestHandler {
             OCHResponseLogger.logOperationResult("SEND (Confirm 004)", result);
             if(result){
                 batchIdIO.setBatchId(batchIdIO.getBatchId()+1);
-                // Task keeps its current uniqueId; we only send (current - 1) to OCH for the confirm request
+                if (nextUniqueId != null) {
+                    task.setUniqueId(nextUniqueId);
+                }
                 task.setConfirmedExecutionDate(request.getConfirmedExecutionDate());
                 if(request.getConfirmationStatus()!=""){
                 ConfirmationStatusEntity status = confirmationStatusRepository.findById(Long.parseLong(request.getConfirmationStatus()))

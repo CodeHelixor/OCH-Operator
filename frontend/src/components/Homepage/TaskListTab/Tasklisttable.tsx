@@ -75,6 +75,16 @@ const columns: readonly Column[] = [
   },
 ];
 
+/** Transaction types shown in the task list table. Only these are displayed. */
+const ALLOWED_TASK_TRANSACTION_TYPES = new Set([
+  "001", // NP Create
+  "002", // NP OCH Resp
+  "004", // NP Confirmation
+  "008", // NP Completion
+  "009", // NP Update
+  "012", // NP Return
+]);
+
 const tnsTypes = [
   "",
   "NP Create",
@@ -148,6 +158,8 @@ export default function Tasklisttable({ tasks, numbers }: TaskTableProps) {
     const sorted = [...tasks].sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
     const seen = new Set<string>();
     return sorted.filter((t) => {
+      const txType = t.transactionType != null ? t.transactionType.trim() : "";
+      if (!ALLOWED_TASK_TRANSACTION_TYPES.has(txType)) return false;
       const key = getTaskKey(t);
       if (seen.has(key)) return false;
       seen.add(key);
