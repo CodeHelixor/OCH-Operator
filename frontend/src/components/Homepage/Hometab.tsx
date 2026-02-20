@@ -20,6 +20,28 @@ export default function Hometab() {
   const [tasks, setTasks] = React.useState<TaskData[]>([]);
   const [errors, setErrors] = React.useState<ErrorData[]>([]);
 
+  // Filter MSISDN state (Number tab): search prefix and status filter
+  const [numberFilterType, setNumberFilterType] = React.useState<string>("0");
+  const [numberSearchStr, setNumberSearchStr] = React.useState<string>("");
+  const displayedNumbers = React.useMemo(() => {
+    let list = numbers;
+    const searchStr = numberSearchStr.trim();
+    if (searchStr) {
+      list = list.filter((item: NumberData) => {
+        const msisdn = item.telephoneNumber ?? (item as unknown as { msisdn?: string }).msisdn ?? "";
+        return msisdn.startsWith(searchStr);
+      });
+    }
+    if (numberFilterType !== "0") {
+      const statusValue = (item: NumberData) =>
+        typeof item.status === "object" && item.status && "value" in item.status
+          ? (item.status as { value: string }).value
+          : String(item.status);
+      list = list.filter((item: NumberData) => statusValue(item) === numberFilterType);
+    }
+    return list;
+  }, [numbers, numberSearchStr, numberFilterType]);
+
   const [showAlert, setShowAlert] = React.useState(false);
   const [alertMsg, setAlertMsg] = React.useState("");
   const [alertType, setAlertType] = React.useState<
@@ -163,6 +185,11 @@ export default function Hometab() {
     }
   };
 
+  const handleNumberSearchSubmit = React.useCallback((searchRange: string) => {
+    const searchStr = searchRange.replace(/\*/g, "").trim();
+    setNumberSearchStr(searchStr);
+  }, []);
+
   const handleRangeSearch = (start: string, end: string) => {
     const s = start.trim();
     const e = end.trim();
@@ -215,7 +242,13 @@ export default function Hometab() {
   const renderTabContent = () => {
     return (
       <div>
-        <Numbertab numbers={numbers} visible={value === 0 ? "block" : "none"} />
+        <Numbertab
+          numbers={displayedNumbers}
+          visible={value === 0 ? "block" : "none"}
+          filterType={numberFilterType}
+          onFilterTypeChange={setNumberFilterType}
+          onSearchSubmit={handleNumberSearchSubmit}
+        />
         <Rangetab
           ranges={filteredRanges}
           visible={value === 1 ? "block" : "none"}

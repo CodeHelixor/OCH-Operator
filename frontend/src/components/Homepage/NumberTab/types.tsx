@@ -26,6 +26,9 @@ interface Status {
 export interface NumberTabProps {
   visible: string;
   numbers: NumberData[];
+  filterType?: string;
+  onFilterTypeChange?: (value: string) => void;
+  onSearchSubmit?: (searchRange: string) => void;
 }
 
 export interface NumberTableProps {

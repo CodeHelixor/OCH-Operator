@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import Msisdninput from "./MsisdnInput";
 import Radiogroup from "./Radiogroup";
 import Searchbar from "./Searchbar";
@@ -9,7 +9,17 @@ import Importmodal from "../modals/Importmodal";
 import { ImportModalData } from "../types";
 import { useAuth } from "../../../../context/AuthContext";
 
-const Numberleftpane = () => {
+type NumberleftpaneProps = {
+  filterType?: string;
+  onFilterTypeChange?: (value: string) => void;
+  onSearchSubmit?: (searchRange: string) => void;
+};
+
+const Numberleftpane = ({
+  filterType = "0",
+  onFilterTypeChange,
+  onSearchSubmit,
+}: NumberleftpaneProps) => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMsg, setAlertMsg] = useState("");
   const [alertType, setAlertType] = useState<
@@ -19,12 +29,10 @@ const Numberleftpane = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
 
   const [searchRange, setSearchRange] = useState("");
-  const [filterType, setFilterType] = useState("0");
   const API_BASE_URL =
     window._env_?.REACT_APP_API_BASE_URL || "http://localhost:8080";
 
   const { userId } = useAuth();
-  const { dispatch } = useGlobalState();
 
   let fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -67,35 +75,10 @@ const Numberleftpane = () => {
     fileInputRef.current?.click();
   };
 
-  const onSearch = async () => {
-    if (!searchRange.includes("*")) {
-      setSearchRange(searchRange + "*");
-    }
-    const searchStr = searchRange.replace("*", "").trim();
-    try {
-      const res = await fetch(`${API_BASE_URL}/get/numbers`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      let data = await res.json();
-      if (!Array.isArray(data)) data = [];
-      if (searchStr !== "") {
-        data = data.filter((item: any) => {
-          const phone = item.telephoneNumber ?? item.msisdn ?? "";
-          return String(phone).startsWith(searchStr);
-        });
-      }
-      if (filterType !== "0") {
-        data = data.filter((item: any) => {
-          const statusVal = item.status?.value ?? item.status;
-          return statusVal === filterType;
-        });
-      }
-      dispatch({ type: "SET_SEARCHED_NUMBERS", payload: data });
-    } catch (err) {
-      dispatch({ type: "SET_SEARCHED_NUMBERS", payload: [] });
+  const onSearch = () => {
+    if (onSearchSubmit) {
+      const rangeToSubmit = searchRange.trim() ? (searchRange.includes("*") ? searchRange : searchRange + "*") : "";
+      onSearchSubmit(rangeToSubmit);
     }
   };
 
@@ -198,17 +181,10 @@ const Numberleftpane = () => {
       onSearch(); // call your login function
     }
   };
-  const onFilterTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFilterType(e.target.value);
+  const handleFilterTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    onFilterTypeChange?.(value);
   };
-  const isInitialMount = useRef(true);
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-    onSearch();
-  }, [filterType]);
 
   return (
     <div className="bg-surface-card rounded-xl px-7 py-7 ml-8 my-5 shadow-sm border border-slate-200/60 card-interactive flex flex-col" style={{ height: 687 }}>
@@ -220,7 +196,7 @@ const Numberleftpane = () => {
           onKeyDown={searchbarEnterPressed}
         />
         <div className="mt-6">
-          <Radiogroup value={filterType} onChange={onFilterTypeChange} />
+          <Radiogroup value={filterType} onChange={handleFilterTypeChange} />
         </div>
         <AlertComponent
           show={showAlert}
