@@ -24,6 +24,7 @@ const Numberleftpane = () => {
     window._env_?.REACT_APP_API_BASE_URL || "http://localhost:8080";
 
   const { userId } = useAuth();
+  const { dispatch } = useGlobalState();
 
   let fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -70,7 +71,7 @@ const Numberleftpane = () => {
     if (!searchRange.includes("*")) {
       setSearchRange(searchRange + "*");
     }
-    const searchStr = searchRange.replace("*", "");
+    const searchStr = searchRange.replace("*", "").trim();
     try {
       const res = await fetch(`${API_BASE_URL}/get/numbers`, {
         method: "POST",
@@ -79,17 +80,22 @@ const Numberleftpane = () => {
         },
       });
       let data = await res.json();
-      console.log("====================here======================");
-      console.log(data);
-      if (searchRange != "") {
-        data = data.filter((item: any) => item.msisdn.startsWith(searchStr));
+      if (!Array.isArray(data)) data = [];
+      if (searchStr !== "") {
+        data = data.filter((item: any) => {
+          const phone = item.telephoneNumber ?? item.msisdn ?? "";
+          return String(phone).startsWith(searchStr);
+        });
       }
-      if (filterType != "0") {
-        data = data.filter((item: any) => item.status.value === filterType);
+      if (filterType !== "0") {
+        data = data.filter((item: any) => {
+          const statusVal = item.status?.value ?? item.status;
+          return statusVal === filterType;
+        });
       }
-      // dispatch({ type: "SET_SEARCHED_NUMBERS", payload: data });
+      dispatch({ type: "SET_SEARCHED_NUMBERS", payload: data });
     } catch (err) {
-      // console.log("Error initializing or fetching data: ", err);
+      dispatch({ type: "SET_SEARCHED_NUMBERS", payload: [] });
     }
   };
 
@@ -195,11 +201,13 @@ const Numberleftpane = () => {
   const onFilterTypeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFilterType(e.target.value);
   };
+  const isInitialMount = useRef(true);
   useEffect(() => {
-    const fetchData = async () => {
-      await onSearch();
-    };
-    fetchData();
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    onSearch();
   }, [filterType]);
 
   return (

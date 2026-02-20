@@ -6,6 +6,7 @@ const GlobalContext = createContext();
 //Initial State
 const initialState = {
   numbers: [],
+  filterApplied: false, // true after user uses Filter MSISDN or search in Number tab
 };
 
 //Reducer function
@@ -16,7 +17,7 @@ function Reducer(state, action) {
     case "ADD_NUMBER":
       return { ...state, numbers: [...state.numbers, action.payload] };
     case "SET_SEARCHED_NUMBERS":
-      return { ...state, numbers: action.payload };
+      return { ...state, numbers: action.payload, filterApplied: true };
     case "DELETE_NUMBER":
       return {
         ...state,
