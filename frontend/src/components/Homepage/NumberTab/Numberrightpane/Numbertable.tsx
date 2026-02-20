@@ -340,6 +340,26 @@ export default function Numbertable({ numbers }: NumberTableProps) {
                       }
 
                       if (column.id === "actions") {
+                        const statusId =
+                          row.status &&
+                          typeof row.status === "object" &&
+                          "id" in row.status
+                            ? (row.status as { id: number }).id
+                            : undefined;
+                        if (statusId === 3) {
+                          return (
+                            <TableCell key={column.id} align={column.align}>
+                              <span
+                                style={{
+                                  color: "#2e7d32",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                NP completed
+                              </span>
+                            </TableCell>
+                          );
+                        }
                         const currentOp = getCurrentNetworkOperator(row);
                         const loggedInOp = (username ?? "").trim();
                         // Trash when recipient_network_operator is the logged-in user; Reject when it is not.
