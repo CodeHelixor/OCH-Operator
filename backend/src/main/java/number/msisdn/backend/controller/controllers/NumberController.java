@@ -14,11 +14,13 @@ import number.msisdn.backend.controller.api.number.ConfirmRequestHandler;
 import number.msisdn.backend.controller.api.number.CreateRequestHandler;
 import number.msisdn.backend.controller.api.number.GetNumberRequestHandler;
 import number.msisdn.backend.controller.api.number.NpRejectRequestHandler;
+import number.msisdn.backend.controller.api.number.ReturnRequestHandler;
 import number.msisdn.backend.controller.requests.CancelRequest;
 import number.msisdn.backend.controller.requests.CompleteRequest;
 import number.msisdn.backend.controller.requests.ConfirmReqeust;
 import number.msisdn.backend.controller.requests.CreateRequest;
 import number.msisdn.backend.controller.requests.NpRejectRequest;
+import number.msisdn.backend.controller.requests.ReturnRequest;
 import number.msisdn.backend.controller.responses.CreateResponse;
 import number.msisdn.backend.database.entities.NumberEntity;
 
@@ -30,14 +32,16 @@ public class NumberController {
     private ConfirmRequestHandler confirmRequestHandler;
     private CompletionRequestHandler completionRequestHandler;
     private NpRejectRequestHandler npRejectRequestHandler;
+    private ReturnRequestHandler returnRequestHandler;
 
-    public NumberController(GetNumberRequestHandler getNumberRequestHandler, CreateRequestHandler createRequestHandler, CancelRequestHandler cancelRequestHandler, ConfirmRequestHandler confirmRequestHandler, CompletionRequestHandler completionRequestHandler, NpRejectRequestHandler npRejectRequestHandler){
+    public NumberController(GetNumberRequestHandler getNumberRequestHandler, CreateRequestHandler createRequestHandler, CancelRequestHandler cancelRequestHandler, ConfirmRequestHandler confirmRequestHandler, CompletionRequestHandler completionRequestHandler, NpRejectRequestHandler npRejectRequestHandler, ReturnRequestHandler returnRequestHandler){
         this.getNumberRequestHandler = getNumberRequestHandler;
         this.createRequestHandler = createRequestHandler;
         this.cancelRequestHandler = cancelRequestHandler;
         this.confirmRequestHandler = confirmRequestHandler;
         this.completionRequestHandler = completionRequestHandler;
         this.npRejectRequestHandler = npRejectRequestHandler;
+        this.returnRequestHandler = returnRequestHandler;
     }
     @PostMapping("/get/numbers")
     public List<NumberEntity>  handleGetAllRequest(){
@@ -69,5 +73,14 @@ public class NumberController {
     public boolean handleCompletionRequest(@PathVariable String originatingOrderNumber,  @RequestBody CompleteRequest request) {      
         return completionRequestHandler.handle(originatingOrderNumber, request);
     }
-    
+
+    @PostMapping("/return/{originatingOrderNumber}")
+    public boolean handleReturnRequest(@PathVariable String originatingOrderNumber, @RequestBody ReturnRequest request) {
+        return returnRequestHandler.handle(originatingOrderNumber, request);
+    }
+
+    @PostMapping("/npreturn/{originatingOrderNumber}")
+    public boolean handleNpReturnRequest(@PathVariable String originatingOrderNumber, @RequestBody ReturnRequest request) {
+        return returnRequestHandler.handle(originatingOrderNumber, request);
+    }
 }

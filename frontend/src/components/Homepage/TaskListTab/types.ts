@@ -56,3 +56,19 @@ export interface NPCompleteModalData {
 export type NPCompleteModalError = {
   [k in keyof NPCompleteModalData]: string;
 };
+
+/** NPReturn (TransactionType 012) – To OCH: TelephoneNumber (M), OriginatingOrderNumber (M), SeriesCount (M), Series* (O), Comment* (O) */
+export interface NPReturnModalData {
+  telephoneNumber: string;
+  originatingOrderNumber: string;
+  seriesCount: number;
+  series: { start: string; end: string }[];
+  comments: string[];
+}
+export type NPReturnModalError = {
+  telephoneNumber: string;
+  originatingOrderNumber: string;
+  seriesCount: string;
+  series: string;
+  comments: string;
+};

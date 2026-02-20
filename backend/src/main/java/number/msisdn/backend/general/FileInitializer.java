@@ -58,7 +58,7 @@ public class FileInitializer {
                     }
                 }
             } catch (IOException e) {
-                System.err.println("Failed to create or write to the file 'operator': " + e.getMessage());
+                if (!OCHResponseLogger.REQUEST_RESPONSE_ONLY) System.err.println("Failed to create or write to the file 'operator': " + e.getMessage());
             }
         } else {
             // System.out.println("File 'operator' already exists.");

@@ -13,11 +13,13 @@ import NPConfirmModal from "./modals/NPConfirmModal";
 import {
   NPCompleteModalData,
   NPConfirmationModalData,
+  NPReturnModalData,
   TaskData,
   TaskTableProps,
 } from "./types";
 import AlertComponent from "../../general/AlertComponent";
 import NPCompleteModal from "./modals/NPCompleteModal";
+import NPReturnModal from "./modals/NPReturnModal";
 import { useAuth } from "../../../context/AuthContext";
 
 interface Column {
@@ -123,6 +125,7 @@ export default function Tasklisttable({ tasks, numbers }: TaskTableProps) {
   const [selectedRow, setSelectedRow] = React.useState<TaskData | null>(null);
   const [isConfirmModalOpen, setIsConfirmModalOpen] = React.useState(false);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = React.useState(false);
+  const [isReturnModalOpen, setIsReturnModalOpen] = React.useState(false);
 
   const [showAlert, setShowAlert] = React.useState(false);
   const [alertMsg, setAlertMsg] = React.useState("");
@@ -280,6 +283,52 @@ export default function Tasklisttable({ tasks, numbers }: TaskTableProps) {
     setIsCompleteModalOpen(true);
   };
 
+  const openReturnModal = (row: TaskData) => {
+    setSelectedRow(row);
+    setIsReturnModalOpen(true);
+  };
+
+  const onNPReturnModalOK = async (formData: NPReturnModalData) => {
+    setIsReturnModalOpen(false);
+    try {
+      const res = await fetch(
+        `${API_BASE_URL}/npreturn/${selectedRow?.originatingOrderNumber}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            telephoneNumber: formData.telephoneNumber,
+            originatingOrderNumber: formData.originatingOrderNumber,
+            seriesCount: formData.seriesCount,
+            series: formData.series,
+            comments: formData.comments,
+          }),
+        }
+      );
+      if (!res.ok) throw new Error(`Return request failed: ${res.statusText}`);
+      const result = await res.json();
+      if (result) {
+        setShowAlert(true);
+        setAlertMsg("NP Return request sent to OCH");
+        setAlertType("success");
+      } else {
+        setShowAlert(true);
+        setAlertMsg("NP Return request was not sent");
+        setAlertType("error");
+      }
+      setTimeout(() => setShowAlert(false), 3000);
+    } catch (err) {
+      setShowAlert(true);
+      setAlertMsg("NP Return request failed");
+      setAlertType("error");
+      setTimeout(() => setShowAlert(false), 3000);
+    }
+  };
+
+  const onNPReturnModalCancel = () => {
+    setIsReturnModalOpen(false);
+  };
+
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
       <TableContainer sx={{ height: 650 }}>
@@ -332,7 +381,7 @@ export default function Tasklisttable({ tasks, numbers }: TaskTableProps) {
                     })}
                     <TableCell align="center">
                       <Box sx={{ display: "flex", gap: 1, justifyContent: "center", flexWrap: "wrap" }}>
-                        {row.transactionType === "001" && !row.isCompleted && (
+                        {(row.transactionType === "001" || row.transactionType === "002") && !row.isCompleted && (
                           <Button
                             variant="contained"
                             size="small"
@@ -352,6 +401,16 @@ export default function Tasklisttable({ tasks, numbers }: TaskTableProps) {
                             onClick={() => openCompleteModal(row)}
                           >
                             Complete
+                          </Button>
+                        )}
+                        {row.transactionType === "009" && !row.isCompleted && (
+                          <Button
+                            variant="contained"
+                            size="small"
+                            color="error"
+                            onClick={() => openReturnModal(row)}
+                          >
+                            Return
                           </Button>
                         )}
                         {row.isCompleted && (
@@ -385,6 +444,13 @@ export default function Tasklisttable({ tasks, numbers }: TaskTableProps) {
           selectedTask={selectedRow}
           onNPCompleteModalOK={onNPCompleteModalOK}
           onNPCompleteModalCancel={onNPCompleteModalCancel}
+        />
+      )}
+      {isReturnModalOpen && selectedRow && (
+        <NPReturnModal
+          selectedTask={selectedRow}
+          onNPReturnModalOK={onNPReturnModalOK}
+          onNPReturnModalCancel={onNPReturnModalCancel}
         />
       )}
       <AlertComponent

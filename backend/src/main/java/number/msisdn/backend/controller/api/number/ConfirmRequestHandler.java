@@ -38,17 +38,17 @@ public class ConfirmRequestHandler {
             Batch batch = new Batch();
             batch.setId(batchIdIO.getBatchId()); // Or use unique ID generation
             //Create one transaction
-            // OCH expects uniqueId incremented by 1 for confirm (e.g. 2503434 -> 2503435)
+            // OCH expects uniqueId decremented by 1 for confirm (e.g. 2505534 -> 2505533)
             String currentUniqueId = task.getUniqueId();
-            String nextUniqueId = currentUniqueId != null && !currentUniqueId.isEmpty()
-                    ? String.valueOf(Long.parseLong(currentUniqueId) + 1)
+            String sendUniqueId = currentUniqueId != null && !currentUniqueId.isEmpty()
+                    ? String.valueOf(Long.parseLong(currentUniqueId) - 1)
                     : currentUniqueId;
 
             Transaction tx = new Transaction();
             tx.setTransactionType("004"); 
             tx.setTelephoneNumber(task.getTelephoneNumber());
             tx.setOchOrderNumber(task.getOchOrderNumber());
-            tx.setUniqueId(nextUniqueId);
+            tx.setUniqueId(sendUniqueId);
             tx.setOriginatingOrderNumber(task.getOriginatingOrderNumber());
             tx.setConfirmedExecutionDate(request.getConfirmedExecutionDate());
             // System.out.println(request.getConfirmationStatus());
@@ -65,9 +65,7 @@ public class ConfirmRequestHandler {
             OCHResponseLogger.logOperationResult("SEND (Confirm 004)", result);
             if(result){
                 batchIdIO.setBatchId(batchIdIO.getBatchId()+1);
-                if (nextUniqueId != null) {
-                    task.setUniqueId(nextUniqueId);
-                }
+                // Task keeps its current uniqueId; we only send (current - 1) to OCH for the confirm request
                 task.setConfirmedExecutionDate(request.getConfirmedExecutionDate());
                 if(request.getConfirmationStatus()!=""){
                 ConfirmationStatusEntity status = confirmationStatusRepository.findById(Long.parseLong(request.getConfirmationStatus()))

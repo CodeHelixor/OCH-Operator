@@ -30,8 +30,10 @@ public class IchRangeSeeder {
                 // System.out.println("ICH Range table already seeded.");
             }
         } catch (Exception e) {
-            System.err.println("Error while seeding ICH range:");
-            e.printStackTrace();
+            if (!number.msisdn.backend.general.OCHResponseLogger.REQUEST_RESPONSE_ONLY) {
+                System.err.println("Error while seeding ICH range:");
+                e.printStackTrace();
+            }
             throw e; // rethrow to crash app (optional)
         }
     }

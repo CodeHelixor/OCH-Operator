@@ -68,6 +68,7 @@ public class RepeatedlyReadFromOCH {
                 try {
                     Batch batch = soapClient.getPort().receive(0);
                     OCHResponseLogger.logReceivedBatch(batch);
+                    persistReceivedBatchToTasklist(batch);
                     boolean confirmed = soapClient.getPort().confirm(batch.getId());
                     OCHResponseLogger.logOperationResult("CONFIRM (Batch ID: " + batch.getId() + ")", confirmed);
                     if(confirmed){
@@ -81,6 +82,46 @@ public class RepeatedlyReadFromOCH {
         }
     }
 
+    /**
+     * Persists the received batch to tasklisttable (same data as logged to console).
+     * Upserts by originatingOrderNumber so each transaction is stored/updated once.
+     */
+    private void persistReceivedBatchToTasklist(Batch batch) {
+        List<Transaction> transactions = batch != null ? batch.getTransactions() : null;
+        if (transactions == null || transactions.isEmpty()) return;
+        for (Transaction tx : transactions) {
+            if (tx == null || tx.getOriginatingOrderNumber() == null) continue;
+            // 005 (NP Error): do not store/update tasklist; error is written to errortable only in processBatch
+            String txType = tx.getTransactionType() != null ? tx.getTransactionType().trim() : null;
+            if ("005".equals(txType)) continue;
+            List<TasklistEntity> existing = tasklistRepository.findByOriginatingOrderNumber(tx.getOriginatingOrderNumber());
+            TasklistEntity task = existing.isEmpty() ? new TasklistEntity() : existing.get(0);
+            task.setTransactionType(tx.getTransactionType());
+            task.setTelephoneNumber(tx.getTelephoneNumber());
+            task.setOchOrderNumber(tx.getOchOrderNumber());
+            task.setUniqueId(tx.getUniqueId());
+            task.setOriginatingOrderNumber(tx.getOriginatingOrderNumber());
+            task.setCurrentServiceOperator(tx.getCurrentServiceOperator());
+            task.setCurrentNetworkOperator(tx.getCurrentNetworkOperator());
+            task.setRecipientServiceOperator(tx.getRecipientServiceOperator());
+            task.setRecipientNetworkOperator(tx.getRecipientNetworkOperator());
+            task.setCurrentNumberType(tx.getCurrentNumberType());
+            task.setRequestedExecutionDate(tx.getRequestedExecutionDate());
+            task.setPointOfConnection(tx.getPointOfConnection());
+            task.setConfirmedExecutionDate(tx.getConfirmedExecutionDate());
+            if (tx.getConfirmationStatus() != null) {
+                task.setConfirmationStatus(confirmationStatusRepository.findById(tx.getConfirmationStatus().longValue())
+                        .orElse(null));
+            } else {
+                task.setConfirmationStatus(null);
+            }
+            if (existing.isEmpty()) {
+                task.setIsCompleted(false);
+            }
+            tasklistRepository.save(task);
+        }
+    }
+
     public void processBatch(Batch batch){
         List<Transaction> transactions = batch.getTransactions();
         if (transactions == null) return;
@@ -88,29 +129,7 @@ public class RepeatedlyReadFromOCH {
             Transaction transaction = transactions.get(i);
             String transactionType = transaction.getTransactionType() != null ? transaction.getTransactionType().trim() : null;
             switch (transactionType != null ? transactionType : "") {
-                case "001": //<NP Create> - always save to tasklisttable with all transaction fields
-                    // Task idempotency: only create task if we don't already have one for this order
-                    List<TasklistEntity> existingTasks = tasklistRepository.findByOriginatingOrderNumber(transaction.getOriginatingOrderNumber());
-                    if (existingTasks.isEmpty()) {
-                        TasklistEntity taskEntity = new TasklistEntity();
-                        taskEntity.setTransactionType(transaction.getTransactionType());
-                        taskEntity.setTelephoneNumber(transaction.getTelephoneNumber());
-                        taskEntity.setOchOrderNumber(transaction.getOchOrderNumber());
-                        taskEntity.setUniqueId(transaction.getUniqueId());
-                        taskEntity.setOriginatingOrderNumber(transaction.getOriginatingOrderNumber());
-                        taskEntity.setCurrentServiceOperator(transaction.getCurrentServiceOperator());
-                        taskEntity.setCurrentNetworkOperator(transaction.getCurrentNetworkOperator());
-                        taskEntity.setRecipientServiceOperator(transaction.getRecipientServiceOperator());
-                        taskEntity.setRecipientNetworkOperator(transaction.getRecipientNetworkOperator());
-                        taskEntity.setCurrentNumberType(transaction.getCurrentNumberType());
-                        taskEntity.setRequestedExecutionDate(transaction.getRequestedExecutionDate());
-                        taskEntity.setPointOfConnection(transaction.getPointOfConnection());
-                        taskEntity.setIsCompleted(false);
-                        taskEntity.setConfirmedExecutionDate(transaction.getConfirmedExecutionDate());
-                        taskEntity.setConfirmationStatus(null);
-                        tasklistRepository.save(taskEntity);
-                    }
-
+                case "001": //<NP Create> - tasklist already saved in persistReceivedBatchToTasklist
                     // Number: skip if already processed (idempotency) or if phone already exists for our operator
                     if (numberRepository.findByOriginatingOrderNumber(transaction.getOriginatingOrderNumber()).isPresent()) {
                         break;
@@ -173,7 +192,7 @@ public class RepeatedlyReadFromOCH {
                         e.printStackTrace();
                     }   
                     
-                    // If it is generated from <NP Create>
+                    // If it is generated from <NP Create> - tasklist already updated in persistReceivedBatchToTasklist
                     try {
                         Optional<NumberEntity> optionalEntity = numberRepository.findByOriginatingOrderNumber(transaction.getOriginatingOrderNumber());
                         if(optionalEntity.isPresent()){
@@ -191,21 +210,13 @@ public class RepeatedlyReadFromOCH {
                             newNotifyEntity.setNotifyType("success");
                             newNotifyEntity.setNotify("NP Create request is successfully sent.");
                             notifyRepository.save(newNotifyEntity);
-
-                            // Update tasklisttable with ochOrderNumber and uniqueId so task has all data
-                            List<TasklistEntity> tasklists002 = tasklistRepository.findByOriginatingOrderNumber(transaction.getOriginatingOrderNumber());
-                            for (TasklistEntity task : tasklists002) {
-                                task.setOchOrderNumber(transaction.getOchOrderNumber());
-                                task.setUniqueId(transaction.getUniqueId());
-                                tasklistRepository.save(task);
-                            }
                             break;
                         }
                     } catch (Exception e) {
-                        System.err.println("error in adding to number entity");
+                        if (!OCHResponseLogger.REQUEST_RESPONSE_ONLY) System.err.println("error in adding to number entity");
                     }
                     break;
-                case "004": //<NP confirmation>
+                case "004": //<NP confirmation> - tasklist already saved in persistReceivedBatchToTasklist
                     //If there is numberEntity, update uniqueid for cancel
                     try {
                         Optional<NumberEntity> optionalEntity = numberRepository.findByOriginatingOrderNumber(transaction.getOriginatingOrderNumber());
@@ -215,43 +226,8 @@ public class RepeatedlyReadFromOCH {
                             numberRepository.save(entity);
                         }
                     } catch (Exception e) {
-                        System.err.println("error in adding to number entity");
+                        if (!OCHResponseLogger.REQUEST_RESPONSE_ONLY) System.err.println("error in adding to number entity");
                     }
-
-                    List<TasklistEntity> tasklists = tasklistRepository.findByOriginatingOrderNumber(transaction.getOriginatingOrderNumber());
-                    if(tasklists.size() != 0){  //in the case of when NP Confirmation task already exist in RecipientOperator
-                        TasklistEntity task = tasklists.get(0);
-                        task.setTransactionType("004"); // change 001->004 so UI shows COMPLETE instead of CONFIRM
-                        task.setConfirmedExecutionDate(transaction.getConfirmedExecutionDate());
-                        task.setUniqueId(transaction.getUniqueId());
-                        if(transaction.getConfirmationStatus()!=null){
-                            ConfirmationStatusEntity status = confirmationStatusRepository.findById((transaction.getConfirmationStatus()).longValue())
-                                                        .orElseThrow(() -> new RuntimeException("Status not found"));
-                            task.setConfirmationStatus(status);
-                        }else{
-                            task.setConfirmationStatus(null);
-                        }
-                        tasklistRepository.save(task);
-                        break;
-                    }
-                    TasklistEntity taskEntity1 = new TasklistEntity();
-                    taskEntity1.setTransactionType(transaction.getTransactionType());
-                    taskEntity1.setTelephoneNumber(transaction.getTelephoneNumber());
-                    taskEntity1.setOchOrderNumber(transaction.getOchOrderNumber());
-                    taskEntity1.setUniqueId(transaction.getUniqueId());
-                    taskEntity1.setOriginatingOrderNumber(transaction.getOriginatingOrderNumber());
-                    taskEntity1.setCurrentServiceOperator(transaction.getCurrentServiceOperator());
-                    taskEntity1.setCurrentNetworkOperator(transaction.getCurrentNetworkOperator());
-                    taskEntity1.setCurrentNumberType(transaction.getCurrentNumberType());                                       
-                    taskEntity1.setConfirmedExecutionDate(transaction.getConfirmedExecutionDate());
-                    if(transaction.getConfirmationStatus()!=null){
-                        ConfirmationStatusEntity status = confirmationStatusRepository.findById((transaction.getConfirmationStatus()).longValue())
-                            .orElseThrow(() -> new RuntimeException("Status not found"));
-                        taskEntity1.setConfirmationStatus(status);
-                    }else{
-                        taskEntity1.setConfirmationStatus(null);
-                    }
-                    tasklistRepository.save(taskEntity1);
                     break;
                 case "005": //<NP Error>
                     Optional<ErrorEntity> optionalErrorEntity = errorRepository.findByUniqueId(transaction.getUniqueId());

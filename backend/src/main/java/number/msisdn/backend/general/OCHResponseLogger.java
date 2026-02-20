@@ -13,7 +13,10 @@ import number.msisdn.soapclient.Transaction;
  * Provides comprehensive logging of Batch and Transaction data.
  */
 public class OCHResponseLogger {
-    
+
+    /** When true, only request/response batch data is logged; operation results and exceptions are disabled. */
+    public static final boolean REQUEST_RESPONSE_ONLY = true;
+
     private static final String SEPARATOR = "========================================";
     
     /**
@@ -59,7 +62,7 @@ public class OCHResponseLogger {
         System.out.println("OCH SENT BATCH (" + operation + ") - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         System.out.println(SEPARATOR);
         System.out.println("Batch ID: " + batch.getId());
-        System.out.println("Number of Transactions: " + (batch.getTransactions() != null ? batch.getTransactions().size() : 0));
+        System.out.println("Number of Transactions in batch: " + (batch.getTransactions() != null ? batch.getTransactions().size() : 0));
         System.out.println(SEPARATOR);
         
         if (batch.getTransactions() != null && !batch.getTransactions().isEmpty()) {
@@ -76,6 +79,7 @@ public class OCHResponseLogger {
      * Logs the result of a send/confirm operation
      */
     public static void logOperationResult(String operation, boolean result) {
+        if (REQUEST_RESPONSE_ONLY) return;
         System.out.println(SEPARATOR);
         System.out.println("OCH " + operation + " RESULT: " + (result ? "SUCCESS" : "FAILED"));
         System.out.println(SEPARATOR + "\n");
@@ -196,6 +200,7 @@ public class OCHResponseLogger {
      * Logs an exception that occurred during OCH operation
      */
     public static void logException(String operation, Exception e) {
+        if (REQUEST_RESPONSE_ONLY) return;
         System.out.println("\n" + SEPARATOR);
         System.out.println("OCH " + operation + " EXCEPTION - " + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         System.out.println(SEPARATOR);
