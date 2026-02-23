@@ -442,7 +442,7 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
                             variant="contained"
                             size="small"
                             color="primary"
-                            disabled={row.recipientNetworkOperator === username}
+                            disabled={row.currentNetworkOperator !== username}
                             onClick={() => openConfirmModal(row)}
                           >
                             Confirm
@@ -453,7 +453,7 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
                             variant="contained"
                             size="small"
                             color="success"
-                            // disabled={row.recipientNetworkOperator !== username}
+                            // disabled={row.currentNetworkOperator !== username}
                             onClick={() => openCompleteModal(row)}
                           >
                             Complete
@@ -464,7 +464,7 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
                             variant="contained"
                             size="small"
                             color="error"
-                            disabled={row.recipientNetworkOperator !== username}
+                            disabled={row.currentNetworkOperator !== username}
                             onClick={() => openReturnModal(row)}
                           >
                             Return
