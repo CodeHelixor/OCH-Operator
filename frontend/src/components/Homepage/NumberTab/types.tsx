@@ -29,10 +29,14 @@ export interface NumberTabProps {
   filterType?: string;
   onFilterTypeChange?: (value: string) => void;
   onSearchSubmit?: (searchRange: string) => void;
+  /** Called after a number is successfully deleted so the parent can refetch the list. */
+  onNumberDeleted?: () => void;
 }
 
 export interface NumberTableProps {
   numbers: NumberData[];
+  /** Called after a number is successfully deleted so the parent can refetch the list. */
+  onNumberDeleted?: () => void;
 }
 
 export interface ImportModalData {

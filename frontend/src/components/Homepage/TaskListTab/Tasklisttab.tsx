@@ -5,10 +5,10 @@ import Button from "@mui/material/Button";
 import { Box } from "@mui/material";
 import { TaskTabProps } from "./types";
 
-const Tasklisttab = ({ tasks, visible, numbers }: TaskTabProps) => {
+const Tasklisttab = ({ tasks, visible, numbers, onTaskDeleted }: TaskTabProps) => {
   return (
     <div className="m-5 mt-10" style={{ display: visible }}>
-      <Tasklisttable tasks={tasks} numbers={numbers} />
+      <Tasklisttable tasks={tasks} numbers={numbers} onTaskDeleted={onTaskDeleted} />
     </div>
   );
 };

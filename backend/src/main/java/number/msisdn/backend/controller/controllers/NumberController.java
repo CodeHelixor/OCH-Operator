@@ -12,6 +12,7 @@ import number.msisdn.backend.controller.api.number.CancelRequestHandler;
 import number.msisdn.backend.controller.api.number.CompletionRequestHandler;
 import number.msisdn.backend.controller.api.number.ConfirmRequestHandler;
 import number.msisdn.backend.controller.api.number.CreateRequestHandler;
+import number.msisdn.backend.controller.api.number.DeleteNumberHandler;
 import number.msisdn.backend.controller.api.number.GetNumberRequestHandler;
 import number.msisdn.backend.controller.api.number.NpRejectRequestHandler;
 import number.msisdn.backend.controller.api.number.ReturnRequestHandler;
@@ -33,8 +34,9 @@ public class NumberController {
     private CompletionRequestHandler completionRequestHandler;
     private NpRejectRequestHandler npRejectRequestHandler;
     private ReturnRequestHandler returnRequestHandler;
+    private DeleteNumberHandler deleteNumberHandler;
 
-    public NumberController(GetNumberRequestHandler getNumberRequestHandler, CreateRequestHandler createRequestHandler, CancelRequestHandler cancelRequestHandler, ConfirmRequestHandler confirmRequestHandler, CompletionRequestHandler completionRequestHandler, NpRejectRequestHandler npRejectRequestHandler, ReturnRequestHandler returnRequestHandler){
+    public NumberController(GetNumberRequestHandler getNumberRequestHandler, CreateRequestHandler createRequestHandler, CancelRequestHandler cancelRequestHandler, ConfirmRequestHandler confirmRequestHandler, CompletionRequestHandler completionRequestHandler, NpRejectRequestHandler npRejectRequestHandler, ReturnRequestHandler returnRequestHandler, DeleteNumberHandler deleteNumberHandler){
         this.getNumberRequestHandler = getNumberRequestHandler;
         this.createRequestHandler = createRequestHandler;
         this.cancelRequestHandler = cancelRequestHandler;
@@ -42,6 +44,7 @@ public class NumberController {
         this.completionRequestHandler = completionRequestHandler;
         this.npRejectRequestHandler = npRejectRequestHandler;
         this.returnRequestHandler = returnRequestHandler;
+        this.deleteNumberHandler = deleteNumberHandler;
     }
     @PostMapping("/get/numbers")
     public List<NumberEntity>  handleGetAllRequest(){
@@ -82,5 +85,11 @@ public class NumberController {
     @PostMapping("/npreturn/{originatingOrderNumber}")
     public boolean handleNpReturnRequest(@PathVariable String originatingOrderNumber, @RequestBody ReturnRequest request) {
         return returnRequestHandler.handle(originatingOrderNumber, request);
+    }
+
+    @PostMapping("/deleteNumber/{id}")
+    public ResponseEntity<Boolean> handleDeleteNumberRequest(@PathVariable Long id) {
+        boolean deleted = deleteNumberHandler.handle(id);
+        return ResponseEntity.ok(deleted);
     }
 }

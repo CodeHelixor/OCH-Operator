@@ -36,7 +36,7 @@ const Errortab = ({ visible, errors }: ErrorTabProps) => {
   //   }
   // };
   return (
-    <div className="m-5 mt-10" style={{ display: visible }}>
+    <div className="w-full max-w-full box-border m-[2%] mt-[5%] sm:m-5 sm:mt-10" style={{ display: visible }}>
       {/* <Box display="flex" justifyContent="flex-end" mb={2}>
         <Button variant="contained" color="success" onClick={readNotifications}>
           Read Tasklist

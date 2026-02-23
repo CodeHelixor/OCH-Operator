@@ -10,11 +10,13 @@ import TableRow from "@mui/material/TableRow";
 import IconButton from "@mui/material/IconButton";
 import BlockIcon from "@mui/icons-material/Block";
 import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import Tooltip from "@mui/material/Tooltip";
 import { useGlobalState } from "../../../../context/GlobalState";
 import AlertComponent from "../../../general/AlertComponent";
 import RejectModal, { NpRejectFormData } from "../modals/RejectModal";
 import CancelConfirmModal from "../modals/CancelConfirmModal";
+import DeleteNumberConfirmModal from "../modals/DeleteNumberConfirmModal";
 import { NumberData, NumberTableProps } from "../types";
 import { useAuth } from "../../../../context/AuthContext";
 
@@ -22,7 +24,7 @@ import { useAuth } from "../../../../context/AuthContext";
 const NP_REJECT_TRANSACTION_TYPE = "006";
 
 interface Column {
-  id: "id" | "telephoneNumber" | "actions" | "regdate" | "moddate" | "status";
+  id: "id" | "telephoneNumber" | "actions" | "regdate" | "moddate" | "status" | "remove";
   label: string;
   minWidth?: number;
   align?: "right" | "center" | "left";
@@ -56,6 +58,7 @@ const columns: readonly Column[] = [
     minWidth: 100,
     align: "center",
   },
+  { id: "remove", label: "", minWidth: 56, align: "center" },
 ];
 
 interface Data {
@@ -84,7 +87,7 @@ function getCurrentNetworkOperator(row: NumberData): string {
   return (v ?? "").trim();
 }
 
-export default function Numbertable({ numbers }: NumberTableProps) {
+export default function Numbertable({ numbers, onNumberDeleted }: NumberTableProps) {
   const { username } = useAuth();
   const [localNumbers, setLocalNumbers] = React.useState<NumberData[]>([]);
   const [page, setPage] = React.useState(0);
@@ -96,6 +99,7 @@ export default function Numbertable({ numbers }: NumberTableProps) {
   const [cancelSubmitting, setCancelSubmitting] = React.useState(false);
   const [editModalOpen, setEditModalOpen] = React.useState(false);
   const [selectedRow, setSelectedRow] = React.useState<NumberData | null>(null);
+  const [rowToDelete, setRowToDelete] = React.useState<NumberData | null>(null);
   const [alertMsg, setAlertMsg] = React.useState("");
   const [alertType, setAlertType] = React.useState<
     "success" | "info" | "warning" | "error"
@@ -154,6 +158,44 @@ export default function Numbertable({ numbers }: NumberTableProps) {
   const openCancelModal = (row: NumberData) => {
     setSelectedRow(row);
     setCancelModalOpen(true);
+  };
+
+  const openDeleteNumberModal = (row: NumberData) => {
+    if (row.id == null) return;
+    setRowToDelete(row);
+  };
+
+  const closeDeleteNumberModal = () => {
+    setRowToDelete(null);
+  };
+
+  const handleDeleteNumberConfirm = async () => {
+    if (rowToDelete?.id == null) return;
+    const id = rowToDelete.id;
+    setRowToDelete(null);
+    try {
+      const res = await fetch(`${API_BASE_URL}/deleteNumber/${id}`, {
+        method: "POST",
+      });
+      if (!res.ok) throw new Error(`Delete failed: ${res.statusText}`);
+      const deleted = await res.json();
+      if (deleted) {
+        setShowAlert(true);
+        setAlertMsg("Number removed from list");
+        setAlertType("success");
+        onNumberDeleted?.();
+      } else {
+        setShowAlert(true);
+        setAlertMsg("Number could not be removed");
+        setAlertType("error");
+      }
+      setTimeout(() => setShowAlert(false), 3000);
+    } catch (err) {
+      setShowAlert(true);
+      setAlertMsg("Failed to remove number");
+      setAlertType("error");
+      setTimeout(() => setShowAlert(false), 3000);
+    }
   };
 
   const handleCancelApply = async () => {
@@ -406,6 +448,24 @@ export default function Numbertable({ numbers }: NumberTableProps) {
                           </TableCell>
                         );
                       }
+                      if (column.id === "remove") {
+                        return (
+                          <TableCell key={column.id} align={column.align}>
+                            {row.id != null ? (
+                              <Tooltip title="Remove from list" arrow>
+                                <IconButton
+                                  color="error"
+                                  size="small"
+                                  onClick={() => openDeleteNumberModal(row)}
+                                  aria-label="Remove number from list"
+                                >
+                                  <DeleteOutlineIcon fontSize="small" />
+                                </IconButton>
+                              </Tooltip>
+                            ) : null}
+                          </TableCell>
+                        );
+                      }
                       return (
                         <TableCell key={column.id} align={column.align}>
                           {value}
@@ -452,6 +512,13 @@ export default function Numbertable({ numbers }: NumberTableProps) {
         onApply={handleCancelApply}
         isSubmitting={cancelSubmitting}
       />
+      {rowToDelete != null && (
+        <DeleteNumberConfirmModal
+          selectedNumber={rowToDelete}
+          onConfirm={handleDeleteNumberConfirm}
+          onCancel={closeDeleteNumberModal}
+        />
+      )}
       {/* <EditModal
         show={editModalOpen}
         onClose={() => setEditModalOpen(false)}

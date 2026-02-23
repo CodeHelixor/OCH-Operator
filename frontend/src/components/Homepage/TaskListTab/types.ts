@@ -26,12 +26,16 @@ export interface TaskTabProps {
   visible: string;
   tasks: TaskData[];
   numbers?: { telephoneNumber: string }[];
+  /** Called after a task is successfully deleted so the parent can refetch the list. */
+  onTaskDeleted?: () => void;
 }
 
 export interface TaskTableProps {
   tasks: TaskData[];
   /** When provided, only tasks whose telephoneNumber exists in this list are shown. */
   numbers?: { telephoneNumber: string }[];
+  /** Called after a task is successfully deleted so the parent can refetch the list. */
+  onTaskDeleted?: () => void;
 }
 
 export interface NPConfirmationModalData {

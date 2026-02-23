@@ -8,13 +8,14 @@ import number.msisdn.backend.controller.api.ReadTaskListsRequestHandler;
 import number.msisdn.backend.controller.api.UpdateRequestHandler;
 import number.msisdn.backend.controller.api.notification.DeleteNotificationHandler;
 import number.msisdn.backend.controller.api.notification.ReadNotificationsHandler;
+import number.msisdn.backend.controller.api.task.DeleteTaskHandler;
 import number.msisdn.backend.controller.requests.UpdateRequest;
 import number.msisdn.backend.database.entities.ErrorEntity;
 import number.msisdn.backend.database.entities.NotifyEntity;
 import number.msisdn.backend.database.entities.NumberEntity;
 import number.msisdn.backend.database.entities.TasklistEntity;
 
-import org.hibernate.sql.Delete;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -27,14 +28,16 @@ public class HomeController {
     private ErrorViewedRequestHandler errorViewedRequest;
     private ReadNotificationsHandler readNotificationsHandler;
     private DeleteNotificationHandler deleteNotificationHandler;
+    private DeleteTaskHandler deleteTaskHandler;
 
-    public HomeController(UpdateRequestHandler updateRequestHandler, ReadTaskListsRequestHandler readTaskListsRequestHandler, ReadErrorsHandler readErrorsHandler, ErrorViewedRequestHandler errorViewedRequest, ReadNotificationsHandler readNotificationsHandler, DeleteNotificationHandler deleteNotificationHandler){
+    public HomeController(UpdateRequestHandler updateRequestHandler, ReadTaskListsRequestHandler readTaskListsRequestHandler, ReadErrorsHandler readErrorsHandler, ErrorViewedRequestHandler errorViewedRequest, ReadNotificationsHandler readNotificationsHandler, DeleteNotificationHandler deleteNotificationHandler, DeleteTaskHandler deleteTaskHandler){
         this.updateRequestHandler = updateRequestHandler;
         this.readTaskListsRequestHandler = readTaskListsRequestHandler;
         this.readErrorsHandler = readErrorsHandler;
         this.errorViewedRequest = errorViewedRequest;
         this.readNotificationsHandler = readNotificationsHandler;
         this.deleteNotificationHandler = deleteNotificationHandler;
+        this.deleteTaskHandler = deleteTaskHandler;
     } 
 
     @PostMapping("/get/tasks")
@@ -66,6 +69,12 @@ public class HomeController {
     @PostMapping("/deleteNotify/{id}")
     public boolean handleDeleteNotifyRequest(@PathVariable String id){
         return deleteNotificationHandler.handle(id);
+    }
+
+    @PostMapping("/deleteTask/{id}")
+    public ResponseEntity<Boolean> handleDeleteTaskRequest(@PathVariable Long id){
+        boolean deleted = deleteTaskHandler.handle(id);
+        return ResponseEntity.ok(deleted);
     }
         
 }

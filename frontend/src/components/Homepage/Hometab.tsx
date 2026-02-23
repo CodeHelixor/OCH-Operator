@@ -248,13 +248,14 @@ export default function Hometab() {
           filterType={numberFilterType}
           onFilterTypeChange={setNumberFilterType}
           onSearchSubmit={handleNumberSearchSubmit}
+          onNumberDeleted={readNumbers}
         />
         <Rangetab
           ranges={filteredRanges}
           visible={value === 1 ? "block" : "none"}
           onSearch={handleRangeSearch}
         />
-        <Tasklisttab tasks={tasks} numbers={numbers} visible={value === 2 ? "block" : "none"} />
+        <Tasklisttab tasks={tasks} numbers={numbers} visible={value === 2 ? "block" : "none"} onTaskDeleted={readTasks} />
         <Errortab errors={errors} visible={value === 3 ? "block" : "none"} />
       </div>
     );
