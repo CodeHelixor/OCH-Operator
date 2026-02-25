@@ -9,9 +9,6 @@ import TablePagination from "@mui/material/TablePagination";
 import TableRow from "@mui/material/TableRow";
 import Button from "@mui/material/Button";
 import Box from "@mui/material/Box";
-import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
-import DeleteIcon from "@mui/icons-material/Delete";
 import NPConfirmModal from "./modals/NPConfirmModal";
 import {
   NPCompleteModalData,
@@ -23,7 +20,6 @@ import {
 import AlertComponent from "../../general/AlertComponent";
 import NPCompleteModal from "./modals/NPCompleteModal";
 import NPReturnModal from "./modals/NPReturnModal";
-import DeleteTaskConfirmModal from "./modals/DeleteTaskConfirmModal";
 import { useAuth } from "../../../context/AuthContext";
 
 interface Column {
@@ -140,7 +136,6 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
   const [isConfirmModalOpen, setIsConfirmModalOpen] = React.useState(false);
   const [isCompleteModalOpen, setIsCompleteModalOpen] = React.useState(false);
   const [isReturnModalOpen, setIsReturnModalOpen] = React.useState(false);
-  const [rowToDelete, setRowToDelete] = React.useState<TaskData | null>(null);
 
   const [showAlert, setShowAlert] = React.useState(false);
   const [alertMsg, setAlertMsg] = React.useState("");
@@ -346,44 +341,6 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
     setIsReturnModalOpen(false);
   };
 
-  const openDeleteModal = (row: TaskData) => {
-    if (row.id == null) return;
-    setRowToDelete(row);
-  };
-
-  const closeDeleteModal = () => {
-    setRowToDelete(null);
-  };
-
-  const handleDeleteTaskConfirm = async () => {
-    if (rowToDelete?.id == null) return;
-    const id = rowToDelete.id;
-    setRowToDelete(null);
-    try {
-      const res = await fetch(`${API_BASE_URL}/deleteTask/${id}`, {
-        method: "POST",
-      });
-      if (!res.ok) throw new Error(`Delete failed: ${res.statusText}`);
-      const deleted = await res.json();
-      if (deleted) {
-        setShowAlert(true);
-        setAlertMsg("Transaction removed");
-        setAlertType("success");
-        onTaskDeleted?.();
-      } else {
-        setShowAlert(true);
-        setAlertMsg("Transaction could not be removed");
-        setAlertType("error");
-      }
-      setTimeout(() => setShowAlert(false), 3000);
-    } catch (err) {
-      setShowAlert(true);
-      setAlertMsg("Failed to remove transaction");
-      setAlertType("error");
-      setTimeout(() => setShowAlert(false), 3000);
-    }
-  };
-
   return (
     <Paper sx={{ width: "100%", overflow: "hidden" }}>
       <TableContainer sx={{ height: 650 }}>
@@ -402,7 +359,6 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
               <TableCell align="center" style={{ minWidth: 180 }}>
                 <span className="font-bold text-lg">Actions</span>
               </TableCell>
-              <TableCell align="center" style={{ minWidth: 56 }} />
             </TableRow>
           </TableHead>
           <TableBody>
@@ -475,20 +431,6 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
                         )}
                       </Box>
                     </TableCell>
-                    <TableCell align="center">
-                      {row.id != null && (
-                        <Tooltip title="Remove transaction">
-                          <IconButton
-                            color="error"
-                            size="small"
-                            aria-label="Remove transaction"
-                            onClick={() => openDeleteModal(row)}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </IconButton>
-                        </Tooltip>
-                      )}
-                    </TableCell>
                   </TableRow>
                 ))}
           </TableBody>
@@ -522,13 +464,6 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
           selectedTask={selectedRow}
           onNPReturnModalOK={onNPReturnModalOK}
           onNPReturnModalCancel={onNPReturnModalCancel}
-        />
-      )}
-      {rowToDelete != null && (
-        <DeleteTaskConfirmModal
-          selectedTask={rowToDelete}
-          onConfirm={handleDeleteTaskConfirm}
-          onCancel={closeDeleteModal}
         />
       )}
       <AlertComponent

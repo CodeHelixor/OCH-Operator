@@ -10,7 +10,6 @@ import TableRow from "@mui/material/TableRow";
 import IconButton from "@mui/material/IconButton";
 import BlockIcon from "@mui/icons-material/Block";
 import DeleteIcon from "@mui/icons-material/Delete";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import Tooltip from "@mui/material/Tooltip";
 import { useGlobalState } from "../../../../context/GlobalState";
 import AlertComponent from "../../../general/AlertComponent";
@@ -24,7 +23,7 @@ import { useAuth } from "../../../../context/AuthContext";
 const NP_REJECT_TRANSACTION_TYPE = "006";
 
 interface Column {
-  id: "id" | "telephoneNumber" | "actions" | "regdate" | "moddate" | "status" | "remove";
+  id: "id" | "telephoneNumber" | "actions" | "regdate" | "moddate" | "status";
   label: string;
   minWidth?: number;
   align?: "right" | "center" | "left";
@@ -58,7 +57,6 @@ const columns: readonly Column[] = [
     minWidth: 100,
     align: "center",
   },
-  { id: "remove", label: "", minWidth: 56, align: "center" },
 ];
 
 interface Data {
@@ -445,24 +443,6 @@ export default function Numbertable({ numbers, onNumberDeleted }: NumberTablePro
                                 </Tooltip>
                               )}
                             </div>
-                          </TableCell>
-                        );
-                      }
-                      if (column.id === "remove") {
-                        return (
-                          <TableCell key={column.id} align={column.align}>
-                            {row.id != null ? (
-                              <Tooltip title="Remove from list" arrow>
-                                <IconButton
-                                  color="error"
-                                  size="small"
-                                  onClick={() => openDeleteNumberModal(row)}
-                                  aria-label="Remove number from list"
-                                >
-                                  <DeleteOutlineIcon fontSize="small" />
-                                </IconButton>
-                              </Tooltip>
-                            ) : null}
                           </TableCell>
                         );
                       }
