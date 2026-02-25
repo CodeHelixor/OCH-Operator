@@ -1,4 +1,4 @@
-import React, { ChangeEvent, useEffect, useState } from "react";
+import React, { useState } from "react";
 import { createPortal } from "react-dom";
 import {
   Box,
@@ -41,23 +41,6 @@ const NPConfirmModal: React.FC<ModalProps> = ({
     confirmedExecutionDate: "",
     confirmationStatus: "",
   });
-  const [confirmStatusDisabled, setConfirmStatusDisabled] = useState(true);
-
-  useEffect(() => {
-    const confirmedDate = dayjs(formData.confirmedExecutionDate, "YYYYMMDD");
-    const requestedDate = dayjs(
-      selectedTask.requestedExecutionDate,
-      "YYYYMMDD"
-    );
-
-    // Disable Confirmation Status if both dates are equal (same day)
-    if (confirmedDate.isValid() && confirmedDate.isSame(requestedDate, "day")) {
-      setConfirmStatusDisabled(true);
-      // setFormData((prev) => ({ ...prev, confirmationStatus: "" })); // clear previous value
-    } else {
-      setConfirmStatusDisabled(false);
-    }
-  }, [formData.confirmedExecutionDate]);
 
   const validate = (): boolean => {
     const newErrors: NPConfirmationModalError = {
@@ -218,7 +201,6 @@ const NPConfirmModal: React.FC<ModalProps> = ({
               <FormControl
                 fullWidth
                 error={Boolean(errors.confirmationStatus)}
-                disabled={confirmStatusDisabled}
               >
                 <InputLabel id="demo-simple-select-label">
                   Confirmation Status
