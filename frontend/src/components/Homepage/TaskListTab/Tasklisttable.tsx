@@ -442,7 +442,7 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
                             variant="contained"
                             size="small"
                             color="primary"
-                            disabled={row.currentNetworkOperator !== username}
+                            disabled={row.recipientNetworkOperator === username}
                             onClick={() => openConfirmModal(row)}
                           >
                             Confirm

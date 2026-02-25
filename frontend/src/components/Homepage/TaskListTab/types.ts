@@ -56,6 +56,8 @@ export interface NPCompleteModalData {
   routingInfo: string;
   newNumberType: string;
   numberPorted: string;
+  /** "Have you ever created a NP creation with this phone number?" */
+  hadNpCreationWithThisPhoneNumber: boolean;
 }
 export type NPCompleteModalError = {
   [k in keyof NPCompleteModalData]: string;

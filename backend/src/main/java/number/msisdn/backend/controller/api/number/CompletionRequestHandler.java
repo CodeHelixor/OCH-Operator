@@ -1,5 +1,6 @@
 package number.msisdn.backend.controller.api.number;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,12 +48,30 @@ public class CompletionRequestHandler {
             tx.setTransactionType("008"); // Typically "001" = Add/Port
             tx.setTelephoneNumber(request.getTelephoneNumber());
             tx.setOchOrderNumber(request.getOchOrderNumber());
-            tx.setUniqueId(request.getUniqueId());
 
-            // UniqueId needs to be decremented by 1 when sending to OCH
-            // long uniqueIdValue = Long.parseLong(request.getUniqueId()) - 1;
-            // tx.setUniqueId(String.valueOf(uniqueIdValue));
-            
+            // When checkbox "Have you ever created a NP creation with this phone number?" is checked
+            // AND Recipient_Service_Operator != Recipient_Network_Operator, send UniqueId - 1 to OCH
+            String requestUniqueId = request.getUniqueId();
+            String sendUniqueId = requestUniqueId;
+            boolean applyUniqueIdDecrement = Boolean.TRUE.equals(request.getHadNpCreationWithThisPhoneNumber());
+            if (applyUniqueIdDecrement) {
+                String recipientServiceOperator = request.getRecipientServiceOperator();
+                String recipientNetworkOperator = request.getRecipientNetworkOperator();
+                boolean operatorsEqual = Objects.equals(
+                    recipientServiceOperator != null ? recipientServiceOperator.trim() : "",
+                    recipientNetworkOperator != null ? recipientNetworkOperator.trim() : ""
+                );
+                if (!operatorsEqual && requestUniqueId != null && !requestUniqueId.isEmpty()) {
+                    try {
+                        long uniqueIdValue = Long.parseLong(requestUniqueId.trim());
+                        sendUniqueId = String.valueOf(uniqueIdValue - 1);
+                    } catch (NumberFormatException ignored) {
+                        // keep original if not a number
+                    }
+                }
+            }
+            tx.setUniqueId(sendUniqueId);
+
             tx.setOriginatingOrderNumber(request.getOriginatingOrderNumber());
             tx.setRecipientNetworkOperator(request.getRecipientNetworkOperator());
             tx.setRecipientServiceOperator(request.getRecipientServiceOperator());

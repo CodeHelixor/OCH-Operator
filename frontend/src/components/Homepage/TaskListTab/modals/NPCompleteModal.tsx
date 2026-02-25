@@ -2,6 +2,8 @@ import React, { ChangeEvent, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   Box,
+  Checkbox,
+  FormControlLabel,
   FormControl,
   Grid,
   InputLabel,
@@ -44,6 +46,7 @@ const NPCompleteModal: React.FC<ModalProps> = ({
     routingInfo: "",
     newNumberType: "",
     numberPorted: "",
+    hadNpCreationWithThisPhoneNumber: false,
   });
 
   const [errors, setErrors] = useState<NPCompleteModalError>({
@@ -56,6 +59,7 @@ const NPCompleteModal: React.FC<ModalProps> = ({
     routingInfo: "",
     newNumberType: "",
     numberPorted: "",
+    hadNpCreationWithThisPhoneNumber: "",
   });
   const [confirmStatusDisabled, setConfirmStatusDisabled] = useState(true);
 
@@ -70,6 +74,7 @@ const NPCompleteModal: React.FC<ModalProps> = ({
       routingInfo: "",
       newNumberType: "",
       numberPorted: "",
+      hadNpCreationWithThisPhoneNumber: "",
     };
 
     // Set to false to skip validation (e.g. for testing).
@@ -244,6 +249,25 @@ const NPCompleteModal: React.FC<ModalProps> = ({
               value={selectedTask.telephoneNumber}
               disabled
               slotProps={{ input: { sx: { minHeight: 56 } } }}
+            />
+          </Grid>
+
+          <Grid size={12}>
+            <FormControlLabel
+              control={
+                <Checkbox
+                  id="hadNpCreationWithThisPhoneNumber"
+                  checked={formData.hadNpCreationWithThisPhoneNumber}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      hadNpCreationWithThisPhoneNumber: e.target.checked,
+                    }))
+                  }
+                  color="primary"
+                />
+              }
+              label="Have you ever created an NP using this phone number?"
             />
           </Grid>
 
