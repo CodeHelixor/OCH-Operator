@@ -272,6 +272,10 @@ const NPReturnModal: React.FC<ModalProps> = ({
           </Grid>
         </Box>
 
+        <p className="text-red-600 text-base mt-6 mb-4">
+          After you've returned the phone number, please remove the phone number data from the Tasklist tab using trash button.
+        </p>
+
         <div className="flex justify-end gap-3 mt-7">
           <button
             type="button"

@@ -33,9 +33,6 @@ const DeleteTaskConfirmModal: React.FC<DeleteTaskConfirmModalProps> = ({
         <p className="text-slate-600 mb-6">
           This will remove the transaction for phone number <strong>{phone}</strong> from the list. This action cannot be undone.
         </p>
-        <p className="text-red-600 mb-6 text-sm">
-        After you’ve returned the phone number, please remove the phone number data from both the Tasklist tab and the Database tab..
-        </p>
         <div className="flex justify-end gap-3 mt-7">
           <button
             type="button"
