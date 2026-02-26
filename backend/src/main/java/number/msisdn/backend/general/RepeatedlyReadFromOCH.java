@@ -372,6 +372,11 @@ public class RepeatedlyReadFromOCH {
                                 entity.setStatus(status);
                                 numberRepository.save(entity);
                             }
+                            List<TasklistEntity> tasklists = tasklistRepository.findByOriginatingOrderNumber(transaction.getOriginatingOrderNumber());
+                            for (TasklistEntity task : tasklists) {
+                                task.setIsCompleted(true);
+                                tasklistRepository.save(task);
+                            }
                         }
                     } catch (Exception e) {
                     }     
@@ -410,6 +415,11 @@ public class RepeatedlyReadFromOCH {
                         OCHResponseLogger.logOperationResult("SEND (NP Range Update 010)", result);
                         if(result){
                             batchIdIO.setBatchId(batchIdIO.getBatchId()+1);
+                            List<TasklistEntity> tasklists = tasklistRepository.findByOriginatingOrderNumber(transaction.getOriginatingOrderNumber());
+                            for (TasklistEntity task : tasklists) {
+                                task.setIsCompleted(true);
+                                tasklistRepository.save(task);
+                            }
                         }
                     } catch (Exception e) {
                         e.printStackTrace();

@@ -25,15 +25,22 @@ export interface ConfirmationStatus {
 export interface TaskTabProps {
   visible: string;
   tasks: TaskData[];
-  numbers?: { telephoneNumber: string }[];
+  numbers?: TaskTableNumberRecord[];
   /** Called after a task is successfully deleted so the parent can refetch the list. */
   onTaskDeleted?: () => void;
 }
 
+/** Minimal number record for task list: must include telephoneNumber; recipientNetworkOperator is used to decide if Return button is shown. Optional id used to pick latest when multiple rows exist for same phone. */
+export interface TaskTableNumberRecord {
+  id?: number;
+  telephoneNumber: string;
+  recipientNetworkOperator?: string;
+}
+
 export interface TaskTableProps {
   tasks: TaskData[];
-  /** When provided, only tasks whose telephoneNumber exists in this list are shown. */
-  numbers?: { telephoneNumber: string }[];
+  /** When provided, only tasks whose telephoneNumber exists in this list are shown. recipientNetworkOperator is used to show Return only when it matches the logged-in operator. */
+  numbers?: TaskTableNumberRecord[];
   /** Called after a task is successfully deleted so the parent can refetch the list. */
   onTaskDeleted?: () => void;
 }
