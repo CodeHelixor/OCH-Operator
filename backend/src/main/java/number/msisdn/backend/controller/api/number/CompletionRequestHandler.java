@@ -1,6 +1,5 @@
 package number.msisdn.backend.controller.api.number;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +14,6 @@ import number.msisdn.backend.database.repositories.StatusRepository;
 import number.msisdn.backend.database.repositories.TasklistRepository;
 import number.msisdn.backend.general.BatchIdIO;
 import number.msisdn.backend.general.OCHResponseLogger;
-import number.msisdn.backend.general.FileUtility;
 import number.msisdn.backend.soap.SoapClient;
 import number.msisdn.soapclient.Batch;
 import number.msisdn.soapclient.Transaction;
@@ -45,32 +43,11 @@ public class CompletionRequestHandler {
             Batch batch = new Batch();
             batch.setId(batchIdIO.getBatchId()); // Or use unique ID generation
             Transaction tx = new Transaction();
-            tx.setTransactionType("008"); // Typically "001" = Add/Port
+            tx.setTransactionType("008"); // NP Completion
             tx.setTelephoneNumber(request.getTelephoneNumber());
             tx.setOchOrderNumber(request.getOchOrderNumber());
-
-            // When checkbox "Have you ever created a NP creation with this phone number?" is checked
-            // AND Recipient_Service_Operator != Recipient_Network_Operator, send UniqueId - 1 to OCH
-            String requestUniqueId = request.getUniqueId();
-            String sendUniqueId = requestUniqueId;
-            boolean applyUniqueIdDecrement = Boolean.TRUE.equals(request.getHadNpCreationWithThisPhoneNumber());
-            if (applyUniqueIdDecrement) {
-                String recipientServiceOperator = request.getRecipientServiceOperator();
-                String recipientNetworkOperator = request.getRecipientNetworkOperator();
-                boolean operatorsEqual = Objects.equals(
-                    recipientServiceOperator != null ? recipientServiceOperator.trim() : "",
-                    recipientNetworkOperator != null ? recipientNetworkOperator.trim() : ""
-                );
-                if (!operatorsEqual && requestUniqueId != null && !requestUniqueId.isEmpty()) {
-                    try {
-                        long uniqueIdValue = Long.parseLong(requestUniqueId.trim());
-                        sendUniqueId = String.valueOf(uniqueIdValue - 1);
-                    } catch (NumberFormatException ignored) {
-                        // keep original if not a number
-                    }
-                }
-            }
-            tx.setUniqueId(sendUniqueId);
+            // Use only the database UniqueId (from task) for completion request
+            tx.setUniqueId(task.getUniqueId());
 
             tx.setOriginatingOrderNumber(request.getOriginatingOrderNumber());
             tx.setRecipientNetworkOperator(request.getRecipientNetworkOperator());

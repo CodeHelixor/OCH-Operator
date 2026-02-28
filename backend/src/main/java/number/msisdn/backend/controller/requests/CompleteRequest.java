@@ -14,8 +14,6 @@ public class CompleteRequest {
     private String chargingInfo;
     private String newNumberType;
     private String numberPorted;
-    /** "Have you ever created a NP creation with this phone number?" - when true, UniqueId is decremented by 1 if operators differ */
-    private Boolean hadNpCreationWithThisPhoneNumber;
 
     public String getTelephoneNumber(){
         return telephoneNumber;
@@ -106,12 +104,5 @@ public class CompleteRequest {
     }
     public void setNumberPorted(String numberPorted){
         this.numberPorted = numberPorted;
-    }
-
-    public Boolean getHadNpCreationWithThisPhoneNumber(){
-        return hadNpCreationWithThisPhoneNumber;
-    }
-    public void setHadNpCreationWithThisPhoneNumber(Boolean hadNpCreationWithThisPhoneNumber){
-        this.hadNpCreationWithThisPhoneNumber = hadNpCreationWithThisPhoneNumber;
     }
 }
