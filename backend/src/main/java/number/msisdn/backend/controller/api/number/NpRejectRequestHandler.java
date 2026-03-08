@@ -49,18 +49,12 @@ public class NpRejectRequestHandler {
             Batch batch = new Batch();
             batch.setId(batchIdIO.getBatchId());
 
-            // OCH expects uniqueId incremented by 1 for NP Reject (e.g. 2503943 -> 2503944)
-            String requestUniqueId = request.getUniqueId();
-            String sendUniqueId = requestUniqueId != null && !requestUniqueId.isEmpty()
-                    ? String.valueOf(Long.parseLong(requestUniqueId) + 1)
-                    : requestUniqueId;
-
             Transaction tx = new Transaction();
             tx.setTransactionType(request.getTransactionType() != null && !request.getTransactionType().isEmpty()
                     ? request.getTransactionType() : NP_REJECT_TRANSACTION_TYPE);
             tx.setTelephoneNumber(request.getTelephoneNumber());
             tx.setOchOrderNumber(request.getOchOrderNumber());
-            tx.setUniqueId(sendUniqueId);
+            tx.setUniqueId(request.getUniqueId());
             tx.setOriginatingOrderNumber(request.getOriginatingOrderNumber());
             if (request.getOtherOperator() != null) {
                 tx.setOtherOperator(request.getOtherOperator());

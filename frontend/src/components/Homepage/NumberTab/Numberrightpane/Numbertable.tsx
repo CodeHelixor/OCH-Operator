@@ -246,7 +246,7 @@ export default function Numbertable({ numbers, onNumberDeleted }: NumberTablePro
           transactionType: NP_REJECT_TRANSACTION_TYPE,
           telephoneNumber: data.telephoneNumber,
           ochOrderNumber: data.ochOrderNumber,
-          uniqueId: data.uniqueId,  // Sending the incremented string uniqueId
+          uniqueId: data.uniqueId,
           originatingOrderNumber: data.originatingOrderNumber,
           otherOperator: data.otherOperator,
           rejectCode: data.rejectCode,

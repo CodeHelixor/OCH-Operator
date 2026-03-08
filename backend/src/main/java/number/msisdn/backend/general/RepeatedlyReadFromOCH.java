@@ -332,7 +332,24 @@ public class RepeatedlyReadFromOCH {
                     } catch (Exception e) {
                         e.getStackTrace();
                     }     
-                    break; 
+                    break;
+                case "006": // <NP Reject> - remove number and tasklist for this order
+                    try {
+                        String originatingOrderNumber = transaction.getOriginatingOrderNumber();
+                        if (originatingOrderNumber != null && !originatingOrderNumber.isEmpty()) {
+                            Optional<NumberEntity> numberOpt = numberRepository.findByOriginatingOrderNumber(originatingOrderNumber);
+                            if (numberOpt.isPresent()) {
+                                numberRepository.delete(numberOpt.get());
+                            }
+                            List<TasklistEntity> tasklists = tasklistRepository.findByOriginatingOrderNumber(originatingOrderNumber);
+                            if (!tasklists.isEmpty()) {
+                                tasklistRepository.deleteAll(tasklists);
+                            }
+                        }
+                    } catch (Exception e) {
+                        if (!OCHResponseLogger.REQUEST_RESPONSE_ONLY) System.err.println("error removing data for received NP Reject (006): " + e.getMessage());
+                    }
+                    break;
                 case "007":
                     try {
                         Optional<NumberEntity> numberEntity1= numberRepository.findByOriginatingOrderNumber(transaction.getOriginatingOrderNumber());
