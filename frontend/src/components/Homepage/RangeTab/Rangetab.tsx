@@ -19,9 +19,9 @@ const Rangetab = ({ ranges, visible, onSearch }: RangeTabProps) => {
   const closeModal = () => setModalOpen(false);
 
   return (
-    <div style={{ display: visible }}>
-      <div className="mt-3 mb-3 w-[85%] lg:w-[55%] ml-[2%] flex flex-col">
-        <div className="flex justify-start mb-2">
+    <div className="flex flex-1 flex-col min-h-0" style={{ display: visible }}>
+      <div className="mt-3 mb-3 w-full max-w-full lg:max-w-[55%] ml-0 flex flex-col flex-shrink-0">
+        <div className="flex justify-start mb-2 ml-8">
           <Button
             variant="contained"
             color="primary"
@@ -59,7 +59,7 @@ const Rangetab = ({ ranges, visible, onSearch }: RangeTabProps) => {
           <Rangechangebox />
         </DialogContent>
       </Dialog>
-      <Box sx={{ px: 4, pt: 3, pb: 1 }}>
+      <Box sx={{ px: 4, pt: 3, pb: 1, flex: 1, minHeight: 0, display: "flex", flexDirection: "column", overflow: "hidden" }} className="flex-1 min-h-0 flex flex-col overflow-hidden">
         <Rangetable ranges={ranges} onSearch={onSearch} />
       </Box>
     </div>

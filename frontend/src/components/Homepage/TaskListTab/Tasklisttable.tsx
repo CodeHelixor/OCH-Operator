@@ -162,6 +162,21 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
     return map;
   }, [numbers]);
 
+  /** Map from telephoneNumber to status_id from numbertable (one per phone, most recent row by id). Used to show red Return button when status_id is 2 (Ported In). */
+  const phoneToStatusId = React.useMemo(() => {
+    if (numbers == null || numbers.length === 0) return new Map<string, number>();
+    const sorted = [...numbers].sort((a, b) => (b.id ?? 0) - (a.id ?? 0));
+    const map = new Map<string, number>();
+    for (const n of sorted) {
+      const phone = n.telephoneNumber != null ? n.telephoneNumber.trim() : "";
+      const statusId = n.status != null && typeof n.status === "object" && "id" in n.status ? (n.status as { id: number }).id : undefined;
+      if (phone !== "" && statusId != null && !map.has(phone)) {
+        map.set(phone, statusId);
+      }
+    }
+    return map;
+  }, [numbers]);
+
   const visibleTasks = React.useMemo(() => {
     // Set of telephone numbers that exist in the number table (show only tasks for these)
     const numbersInTable =
@@ -399,8 +414,8 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
   };
 
   return (
-    <Paper sx={{ width: "100%", overflow: "hidden" }}>
-      <TableContainer sx={{ height: 650 }}>
+    <Paper sx={{ width: "100%", overflow: "hidden", display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }} className="flex flex-col flex-1 min-h-0">
+      <TableContainer sx={{ flex: 1, minHeight: 0, overflowX: "hidden", overflowY: "auto" }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
@@ -413,7 +428,7 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
                   <span className="font-bold text-lg">{column.label}</span>
                 </TableCell>
               ))}
-              <TableCell align="center" style={{ minWidth: 180 }}>
+              <TableCell align="center" style={{ minWidth: 90 }}>
                 <span className="font-bold text-lg">Actions</span>
               </TableCell>
               <TableCell align="center" style={{ minWidth: 56 }} />
@@ -422,7 +437,12 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
           <TableBody>
             {visibleTasks
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => (
+              .map((row) => {
+                const phone = (row.telephoneNumber ?? "").trim();
+                const showReturn = phoneToStatusId.get(phone) === 2 ||
+                  (row.transactionType === "009" && !row.isCompleted && phoneToRecipientFromNumberTable.get(phone) === (username || "").trim()) ||
+                  (row.isCompleted && (row.currentNetworkOperator || "").trim() === (username || "").trim() && phoneToRecipientFromNumberTable.get(phone) === (username || "").trim());
+                return (
                   <TableRow
                     hover
                     key={getTaskKey(row)}
@@ -462,7 +482,7 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
                             Confirm
                           </Button>
                         )}
-                        {row.transactionType === "004" && !row.isCompleted && (
+                        {row.transactionType === "004" && !row.isCompleted && !showReturn && (
                           <Button
                             variant="contained"
                             size="small"
@@ -473,12 +493,12 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
                             Complete
                           </Button>
                         )}
-                        {row.transactionType === "009" && !row.isCompleted && phoneToRecipientFromNumberTable.get((row.telephoneNumber ?? "").trim()) === (username || "").trim() && (
+                        {showReturn && (
                           <Button
                             variant="contained"
                             size="small"
                             color="error"
-                            disabled={row.currentNetworkOperator !== username}
+                            disabled={row.transactionType === "009" && !row.isCompleted ? row.currentNetworkOperator !== username : false}
                             onClick={() => openReturnModal(row)}
                           >
                             Return
@@ -487,20 +507,10 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
                         {row.transactionType === "009" && !row.isCompleted && phoneToRecipientFromNumberTable.has((row.telephoneNumber ?? "").trim()) && phoneToRecipientFromNumberTable.get((row.telephoneNumber ?? "").trim()) !== (username || "").trim() && (
                           <Box component="span" sx={{ color: "success.main", fontWeight: 500, fontSize: "0.875rem" }}>NP returned</Box>
                         )}
-                        {row.isCompleted && (row.currentNetworkOperator || "").trim() === (username || "").trim() && phoneToRecipientFromNumberTable.get((row.telephoneNumber ?? "").trim()) === (username || "").trim() && (
-                          <Button
-                            variant="contained"
-                            size="small"
-                            color="error"
-                            onClick={() => openReturnModal(row)}
-                          >
-                            Return
-                          </Button>
-                        )}
                         {row.isCompleted && (row.currentNetworkOperator || "").trim() === (username || "").trim() && phoneToRecipientFromNumberTable.has((row.telephoneNumber ?? "").trim()) && phoneToRecipientFromNumberTable.get((row.telephoneNumber ?? "").trim()) !== (username || "").trim() && (
                           <Box component="span" sx={{ color: "success.main", fontWeight: 500, fontSize: "0.875rem" }}>NP returned</Box>
                         )}
-                        {row.isCompleted && (row.currentNetworkOperator || "").trim() !== (username || "").trim() && (
+                        {row.isCompleted && (row.currentNetworkOperator || "").trim() !== (username || "").trim() && !showReturn && (
                           <span style={{ color: "text.secondary", fontSize: "0.875rem" }}>—</span>
                         )}
                       </Box>
@@ -520,7 +530,8 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
                       )}
                     </TableCell>
                   </TableRow>
-                ))}
+                );
+              })}
           </TableBody>
         </Table>
       </TableContainer>
@@ -532,6 +543,10 @@ export default function Tasklisttable({ tasks, numbers, onTaskDeleted }: TaskTab
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+        sx={{ flexShrink: 0, px: 2, py: 1 }}
+        slotProps={{
+          toolbar: { sx: { justifyContent: "center", flexWrap: "wrap" } },
+        }}
       />
       {isConfirmModalOpen && selectedRow && (
         <NPConfirmModal

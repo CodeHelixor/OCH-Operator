@@ -135,7 +135,7 @@ const NPConfirmModal: React.FC<ModalProps> = ({
       role="presentation"
     >
       <div
-        className="modal-content p-6 w-[400px] max-w-[90%]"
+        className="modal-content p-6 w-[90%] max-w-[400px]"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-xl font-bold mb-4 text-slate-800">

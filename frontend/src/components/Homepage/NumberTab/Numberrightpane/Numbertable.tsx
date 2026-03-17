@@ -85,7 +85,7 @@ function getCurrentNetworkOperator(row: NumberData): string {
   return (v ?? "").trim();
 }
 
-export default function Numbertable({ numbers, onNumberDeleted }: NumberTableProps) {
+export default function Numbertable({ numbers, onNumberDeleted, phoneNumbersWithCompletedTask, phoneNumbersWithConfirmedExecutionDate }: NumberTableProps) {
   const { username } = useAuth();
   const [localNumbers, setLocalNumbers] = React.useState<NumberData[]>([]);
   const [page, setPage] = React.useState(0);
@@ -336,10 +336,10 @@ export default function Numbertable({ numbers, onNumberDeleted }: NumberTablePro
   const editModalOk = () => {};
   return (
     <Paper
-      sx={{ width: "100%", overflow: "hidden" }}
-      className="rounded-lg px-7 py-7 my-5"
+      sx={{ width: "100%", overflow: "hidden", display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }}
+      className="rounded-lg px-7 py-7 my-5 flex flex-col flex-1 min-h-0"
     >
-      <TableContainer sx={{ height: 580 }}>
+      <TableContainer sx={{ flex: 1, minHeight: 0, overflowX: "hidden", overflowY: "auto" }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
@@ -386,7 +386,9 @@ export default function Numbertable({ numbers, onNumberDeleted }: NumberTablePro
                           "id" in row.status
                             ? (row.status as { id: number }).id
                             : undefined;
-                        if (statusId === 3) {
+                        const phone = (row.telephoneNumber ?? "").trim();
+                        const hasCompletedTask = phoneNumbersWithCompletedTask?.has(phone);
+                        if (statusId === 3 || hasCompletedTask) {
                           return (
                             <TableCell key={column.id} align={column.align}>
                               <span
@@ -396,6 +398,21 @@ export default function Numbertable({ numbers, onNumberDeleted }: NumberTablePro
                                 }}
                               >
                                 NP completed
+                              </span>
+                            </TableCell>
+                          );
+                        }
+                        const hasConfirmedExecutionDate = phoneNumbersWithConfirmedExecutionDate?.has(phone);
+                        if (hasConfirmedExecutionDate) {
+                          return (
+                            <TableCell key={column.id} align={column.align}>
+                              <span
+                                style={{
+                                  color: "#f9a825",
+                                  fontWeight: 600,
+                                }}
+                              >
+                                Wait for confirmation
                               </span>
                             </TableCell>
                           );
@@ -466,6 +483,10 @@ export default function Numbertable({ numbers, onNumberDeleted }: NumberTablePro
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+        sx={{ flexShrink: 0, px: 2, py: 1 }}
+        slotProps={{
+          toolbar: { sx: { justifyContent: "center", flexWrap: "wrap" } },
+        }}
       />
       <AlertComponent
         show={showAlert}

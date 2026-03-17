@@ -222,7 +222,7 @@ const NPCompleteModal: React.FC<ModalProps> = ({
       role="presentation"
     >
       <div
-        className="modal-content p-8 w-full max-w-4xl min-h-[480px]"
+        className="modal-content p-8 w-full max-w-4xl flex flex-col min-h-0"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-xl font-bold mb-4 text-slate-800">

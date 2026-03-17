@@ -30,11 +30,13 @@ export interface TaskTabProps {
   onTaskDeleted?: () => void;
 }
 
-/** Minimal number record for task list: must include telephoneNumber; recipientNetworkOperator is used to decide if Return button is shown. Optional id used to pick latest when multiple rows exist for same phone. */
+/** Minimal number record for task list: must include telephoneNumber; recipientNetworkOperator is used to decide if Return button is shown; status.id (status_id) is used to show Return when 2 (Ported In). Optional id used to pick latest when multiple rows exist for same phone. */
 export interface TaskTableNumberRecord {
   id?: number;
   telephoneNumber: string;
   recipientNetworkOperator?: string;
+  /** Number's portation status: id 1=Registered, 2=Ported In, 3=Ported Out. Return button is shown when id === 2. */
+  status?: { id: number; value?: string };
 }
 
 export interface TaskTableProps {

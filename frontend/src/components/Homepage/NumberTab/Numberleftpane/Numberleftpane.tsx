@@ -187,7 +187,7 @@ const Numberleftpane = ({
   };
 
   return (
-    <div className="bg-surface-card rounded-xl px-7 py-7 ml-8 my-5 shadow-sm border border-slate-200/60 card-interactive flex flex-col" style={{ height: 687 }}>
+    <div className="bg-surface-card rounded-xl px-7 py-7 ml-8 my-5 shadow-sm border border-slate-200/60 card-interactive flex flex-col min-h-0">
       <div className="mt-12">
         <Searchbar
           searchRange={searchRange}

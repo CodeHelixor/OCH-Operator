@@ -27,17 +27,17 @@ const columns: readonly Column[] = [
     minWidth: 25,
     align: "center",
   },
-  { id: "transactionType", label: "TnsType", minWidth: 100, align: "center" },
+  { id: "transactionType", label: "TnsType", minWidth: 50, align: "center" },
   {
     id: "telephoneNumber",
     label: "PhoneNumber",
-    minWidth: 100,
+    minWidth: 50,
     align: "center",
   },
   {
     id: "createdAt",
     label: "Created At",
-    minWidth: 100,
+    minWidth: 50,
     align: "center",
   },
   {
@@ -136,8 +136,8 @@ export default function Errortable({ errors }: ErrorTableProps) {
   };
 
   return (
-    <Paper sx={{ width: "100%", overflow: "hidden" }}>
-      <TableContainer sx={{ height: 650 }}>
+    <Paper sx={{ width: "100%", overflow: "hidden", display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }} className="flex flex-col flex-1 min-h-0">
+      <TableContainer sx={{ flex: 1, minHeight: 0, overflowX: "hidden", overflowY: "auto" }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
@@ -242,6 +242,10 @@ export default function Errortable({ errors }: ErrorTableProps) {
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+        sx={{ flexShrink: 0, px: 2, py: 1 }}
+        slotProps={{
+          toolbar: { sx: { justifyContent: "center", flexWrap: "wrap" } },
+        }}
       />
     </Paper>
   );

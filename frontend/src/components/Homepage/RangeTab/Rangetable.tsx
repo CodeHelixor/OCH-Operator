@@ -153,8 +153,8 @@ const Rangetable = ({ ranges, onSearch }: RangeTableProps) => {
   };
 
   return (
-    <Paper sx={{ width: "100%", overflow: "hidden" }}>
-      <Box sx={{ py: 1.5, px: 2, borderBottom: 1, borderColor: "divider" }}>
+    <Paper sx={{ width: "100%", overflow: "hidden", display: "flex", flexDirection: "column", flex: 1, minHeight: 0 }} className="flex flex-col flex-1 min-h-0">
+      <Box sx={{ py: 1.5, px: 2, borderBottom: 1, borderColor: "divider", flexShrink: 0 }}>
         <Stack
           direction="row"
           spacing={2}
@@ -184,7 +184,7 @@ const Rangetable = ({ ranges, onSearch }: RangeTableProps) => {
           </Button>
         </Stack>
       </Box>
-      <TableContainer sx={{ px: 2, pb: 2 }}>
+      <TableContainer sx={{ px: 2, pb: 2, flex: 1, minHeight: 0, overflowX: "hidden", overflowY: "auto" }}>
         <Table stickyHeader aria-label="sticky table">
           <TableHead>
             <TableRow>
@@ -307,6 +307,10 @@ const Rangetable = ({ ranges, onSearch }: RangeTableProps) => {
         page={page}
         onPageChange={handleChangePage}
         onRowsPerPageChange={handleChangeRowsPerPage}
+        sx={{ flexShrink: 0, px: 2, py: 1 }}
+        slotProps={{
+          toolbar: { sx: { justifyContent: "center", flexWrap: "wrap" } },
+        }}
       />
     </Paper>
   );

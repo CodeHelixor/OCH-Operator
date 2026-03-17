@@ -42,6 +42,31 @@ export default function Hometab() {
     return list;
   }, [numbers, numberSearchStr, numberFilterType]);
 
+  /** Phone numbers that have at least one task with isCompleted (is_completed=1) in tasklisttable. */
+  const phoneNumbersWithCompletedTask = React.useMemo(() => {
+    const set = new Set<string>();
+    for (const t of tasks) {
+      if (t.isCompleted && t.telephoneNumber != null) {
+        const phone = t.telephoneNumber.trim();
+        if (phone !== "") set.add(phone);
+      }
+    }
+    return set;
+  }, [tasks]);
+
+  /** Phone numbers that have at least one task with non-empty confirmedExecutionDate; show "Wait for confirmation" in Number table. */
+  const phoneNumbersWithConfirmedExecutionDate = React.useMemo(() => {
+    const set = new Set<string>();
+    for (const t of tasks) {
+      const date = t.confirmedExecutionDate;
+      if (date != null && String(date).trim() !== "" && t.telephoneNumber != null) {
+        const phone = t.telephoneNumber.trim();
+        if (phone !== "") set.add(phone);
+      }
+    }
+    return set;
+  }, [tasks]);
+
   const [showAlert, setShowAlert] = React.useState(false);
   const [alertMsg, setAlertMsg] = React.useState("");
   const [alertType, setAlertType] = React.useState<
@@ -249,6 +274,8 @@ export default function Hometab() {
           onFilterTypeChange={setNumberFilterType}
           onSearchSubmit={handleNumberSearchSubmit}
           onNumberDeleted={readNumbers}
+          phoneNumbersWithCompletedTask={phoneNumbersWithCompletedTask}
+          phoneNumbersWithConfirmedExecutionDate={phoneNumbersWithConfirmedExecutionDate}
         />
         <Rangetab
           ranges={filteredRanges}
@@ -276,8 +303,8 @@ export default function Hometab() {
   // };
 
   return (
-    <div>
-      <div>{renderTabContent()}</div>
+    <div className="flex flex-1 flex-col min-h-0">
+      <div className="flex-1 flex flex-col min-h-0 overflow-hidden">{renderTabContent()}</div>
       <AlertComponent
         show={showAlert}
         message={alertMsg}

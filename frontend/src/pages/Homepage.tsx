@@ -23,7 +23,7 @@ const Homepage = () => {
   //   fetchOrInitData();
   // }, []);
   return (
-    <div className="m-6 animate-fade-in-up">
+    <div className="flex flex-1 flex-col min-h-0 m-6 animate-fade-in-up">
       <Hometab />
     </div>
   );

@@ -108,7 +108,7 @@ const Importmodal: React.FC<ModalProps> = ({
       role="presentation"
     >
       <div
-        className="modal-content p-8 w-full max-w-4xl min-h-[420px] flex flex-col"
+        className="modal-content p-8 w-full max-w-4xl flex flex-col min-h-0"
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="text-xl font-bold mb-12 text-slate-800">Import Number</h2>
